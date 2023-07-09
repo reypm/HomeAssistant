@@ -1,0 +1,34 @@
+{% macro pfsense_cpu_status() %}
+    {% set cpu_usage = states('sensor.pfsense_cpu_usage')|float %}
+    {% if cpu_usage < 50 %}
+        mdi:speedometer-slow
+    {% elif cpu_usage > 50 and cpu_usage < 80 %}
+        mdi:speedometer-medium
+    {% else %}
+        mdi:speedometer
+    {% endif %}
+{% endmacro %}
+
+{% macro pfsense_cpu_icon_color() %}
+    {% set cpu_usage = states('sensor.pfsense_cpu_usage')|float %}
+    {% if cpu_usage < 50 %}
+        green
+    {% elif cpu_usage > 50 and cpu_usage < 80 %}
+        blue
+    {% else %}
+        red
+    {% endif %}
+{% endmacro %}
+
+{% macro pfsense_status(entity_id) %}
+    {% set status = states(entity_id) %}
+    {{ status | capitalize }}
+{% endmacro %}
+
+{% macro pfsense_network_icon(entity_id) %}
+    {{ 'mdi:network' if is_state(entity_id, ['online', 'up']) else 'mdi:network-off' }}
+{% endmacro %}
+
+{% macro pfsense_network_icon_color(entity_id) %}
+    {{ 'blue' if is_state(entity_id, ['online', 'up']) else 'red' }}
+{% endmacro %}

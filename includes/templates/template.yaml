@@ -1,0 +1,16 @@
+---
+# Template
+# https://www.home-assistant.io/integrations/template/
+
+- sensor:
+    - name: Energy Price
+      unique_id: energy_price
+      icon: mdi:counter
+      state_class: total_increasing
+      device_class: energy
+      unit_of_measurement: USD/kWh
+      state: >
+        {% set consumption=states('sensor.energy_meter_consumption')|float(0) %}
+        {% set fuel_adjustment=consumption*0.04260 %}
+        {{ 0.05214 if consumption > 1000 else 0.04989 + fuel_adjustment }}
+      availability: "{{  states('sensor.energy_meter_consumption')|is_number }}"

@@ -1,0 +1,3 @@
+notifications:
+  name: input_boolean.notifications
+  icon: mdi:toggle-switch

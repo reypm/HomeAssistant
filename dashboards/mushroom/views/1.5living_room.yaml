@@ -1,0 +1,92 @@
+title: Living Room
+path: living_room
+icon: mdi:youtube-tv
+type: custom:horizontal-layout
+layout:
+  max_cols: 1
+cards:
+  - type: custom:stack-in-card
+    cards:
+      - type: custom:mushroom-light-card
+        entity: light.family_room
+        fill_container: true
+        layout: horizontal
+        show_brightness_control: true
+      - type: custom:mushroom-fan-card
+        entity: fan.family_room
+        fill_container: true
+        layout: horizontal
+        icon_animation: true
+        show_percentage_control: true
+      - type: custom:mushroom-light-card
+        entity: light.rgbic_tv_backlight
+        fill_container: true
+        layout: horizontal
+
+  - type: custom:mini-media-player
+    entity: media_player.lg_tv_living_room
+    icon: phu:lg-oled55
+    name: LG Tv OLED77C1PUB
+    sound_mode: icon
+    max_volume: 90
+    min_volume: 10
+    toggle_power: true
+
+  - type: custom:mini-media-player
+    entity: media_player.lg_speaker_sp9ya
+    icon: mdi:soundbar
+    name: LG Soundbar SP9YA
+    sound_mode: icon
+    max_volume: 100
+    min_volume: 10
+    toggle_power: true
+
+  - type: custom:mini-media-player
+    entity: media_player.fire_tv_living_room
+    icon: phu:firetv
+    artwork: material
+    volume_stateless: true
+    source: icon
+    sound_mode: icon
+    info: scroll
+    volume_step: 10
+    max_volume: 100
+    min_volume: 10
+    toggle_power: true
+
+  - type: custom:mini-media-player
+    entity: media_player.atv_living_room
+    icon: phu:apple-tv-box
+    artwork: material
+    volume_stateless: true
+    source: icon
+    sound_mode: icon
+    info: scroll
+    volume_step: 10
+    max_volume: 100
+    min_volume: 10
+    toggle_power: true
+
+  - type: grid
+    square: false
+    columns: 2
+    cards:
+      - type: gauge
+        entity: sensor.smartplug_family_room_active_power
+        name: Current Consumption
+        needle: false
+        severity:
+          green: 100
+          yellow: 500
+          red: 700
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: sensor.smartplug_family_room_summation_delivered
+            name: Accumulated kWh
+          - type: custom:mushroom-entity-card
+            entity: sensor.smartplug_family_room_rms_current
+            name: RMS Amp
+          - type: custom:mushroom-entity-card
+            entity: sensor.smartplug_family_room_rms_voltage
+            name: RMS Voltage

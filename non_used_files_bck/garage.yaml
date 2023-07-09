@@ -1,0 +1,18 @@
+title: Garage
+path: garage
+icon: mdi:garage-variant
+type: custom:horizontal-layout
+layout:
+  width: 300
+  max_cols: 5
+cards:
+  - type: custom:mushroom-light-card
+    entity: switch.garage_motion_switch_ks200m
+    name: Light
+    fill_container: true
+    collapsible_controls: true
+    secondary_info: last-changed
+    layout: horizontal
+
+# cover.garage_door
+# binary_sensor.garage_door_myq_gateway

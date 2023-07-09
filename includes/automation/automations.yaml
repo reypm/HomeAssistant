@@ -1,0 +1,18 @@
+- id: '1677076693550'
+  alias: AUTO Local Tuya reconnect
+  description: ''
+  trigger:
+  - platform: homeassistant
+    event: start
+  condition: []
+  action:
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 10
+      milliseconds: 0
+  - service: homeassistant.reload_config_entry
+    target:
+      entity_id: group.all_lights
+    data: {}
+  mode: single

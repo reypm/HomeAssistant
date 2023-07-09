@@ -1,0 +1,15 @@
+---
+# Sensors
+# https://www.home-assistant.io/integrations/sensor/
+
+## Integration Energy Sensors
+- platform: template
+  sensors:
+    # convert value from add-in into statistic
+    water_meter_total_gal:
+      friendly_name: "Total Water Consumption"
+      device_class: water
+      unit_of_measurement: gal
+      value_template: "{{ (states('sensor.water_meter_consumption') | float)  }}"
+      attribute_templates:
+        state_class: total_increasing

@@ -1,0 +1,3 @@
+office_device:
+  name: input_boolean.office_device
+  icon: mdi:toggle-switch

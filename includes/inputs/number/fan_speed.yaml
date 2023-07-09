@@ -1,0 +1,6 @@
+fan_speed:
+  name: Fan Speed
+  initial: 1
+  min: 1
+  max: 4
+  step: 1

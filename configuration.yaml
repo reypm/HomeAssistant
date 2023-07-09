@@ -1,0 +1,124 @@
+###############################################################################
+# THE HOME ASSISTANT CONFIGURATION FILE - MOTHER OF ALL CONFIG FILES
+###############################################################################
+
+## Core Configuration. Do not remove.
+homeassistant:
+  name: Home
+  latitude: !secret latitude_home
+  longitude: !secret longitude_home
+  elevation: 0
+  unit_system: imperial
+  temperature_unit: F
+  time_zone: America/New_York
+  currency: USD
+  internal_url: !secret internal_url
+  external_url: !secret external_url
+  media_dirs:
+    media: /config/media
+  customize:
+    sensor.water_meter_consumption:
+      device_class: water
+    sensor.water_meter:
+      device_class: water
+    sensor.energy_meter_consumption:
+      device_class: energy
+    sensor.energy_meter:
+      device_class: energy
+      unit_of_measurement: USD/kWh
+
+default_config:
+wake_on_lan:
+
+tts:
+  - platform: google_translate
+
+downloader:
+  download_dir: /config/media/downloads
+
+## Frontend
+frontend:
+  themes: !include_dir_merge_named themes/
+  extra_module_url:
+    - /hacsfiles/lovelace-card-mod/card-mod.js
+
+## Lovelace
+lovelace:
+  mode: yaml
+  dashboards: !include dashboards/dashboards.yaml
+
+  resources:
+    - url: /hacsfiles/stack-in-card/stack-in-card.js
+      type: module
+    - url: /hacsfiles/weather-card/weather-card.js
+      type: module
+    # https://github.com/ofekashery/vertical-stack-in-card
+    - url: /hacsfiles/vertical-stack-in-card/vertical-stack-in-card.js?v=0.4.4
+      type: js
+    # https://github.com/kalkih/mini-graph-card
+    - url: /hacsfiles/mini-graph-card/mini-graph-card-bundle.js?v=0.11.0
+      type: module
+    - url: /hacsfiles/lovelace-mushroom/mushroom.js
+      type: module
+    - url: /hacsfiles/mini-media-player/mini-media-player-bundle.js?v=1.16.5
+      type: module
+    - url: /hacsfiles/button-card/button-card.js
+      type: module
+    # https://github.com/thomasloven/lovelace-layout-card
+    - url: /hacsfiles/lovelace-layout-card/layout-card.js
+      type: module
+    - url: /hacsfiles/custom-brand-icons/custom-brand-icons.js
+      type: module
+    - url: /hacsfiles/lovelace-auto-entities/auto-entities.js
+      type: module
+    # https://github.com/custom-cards/stack-in-card
+    - url: /hacsfiles/stack-in-card/stack-in-card.js
+      type: module
+    - url: /hacsfiles/simple-thermostat/simple-thermostat.js
+      type: module
+    - url: /hacsfiles/kiosk-mode/kiosk-mode.js
+      type: module
+    # https://github.com/flixlix/power-flow-card-plus
+    #- url: /hacsfiles/power-flow-card-plus/power-flow-card-plus.js
+    #  type: module
+    # https://github.com/madmicio/LG-WebOS-Remote-Control
+    #- url: /hacsfiles/LG-WebOS-Remote-Control/lg-remote-control.js
+    #  type: module
+
+  # https://github.com/NemesisRE/kiosk-mode
+  # kiosk_mode:
+  #hide_header: false
+  #hide_sidebar: false
+  #hide_menubutton: false
+  #hide_overflow: false
+  #hide_account: true
+  #hide_search: true
+  #ignore_entity_settings: false
+  #ignore_mobile_settings: false
+  #mobile_settings:
+  # hide_header: false
+  # hide_sidebar: false
+  # hide_menubutton: false
+  # hide_account: true
+  # hide_search: true
+  # custom_width: 768
+
+sensor: !include_dir_list includes/sensors/
+automation: !include includes/automation/automations.yaml
+script: !include includes/script/scripts.yaml
+scene: !include includes/scene/scenes.yaml
+ios: !include includes/actions/ios.yaml
+template: !include includes/templates/template.yaml
+input_boolean: !include_dir_merge_named includes/inputs/boolean
+input_number: !include_dir_merge_named includes/inputs/number
+
+## Groups
+group: !include includes/groups/groups.yaml
+## Logger
+#logger:
+#  default: warning
+#  logs:
+#    custom_components.localtuya: debug
+#    custom_components.localtuya.pytuya: debug
+#pyatv: debug
+#homeassistant.components.apple_tv: debug

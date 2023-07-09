@@ -1,0 +1,21 @@
+title: Dinning Room
+path: dinning_room
+icon: mdi:table-chair
+type: custom:horizontal-layout
+layout:
+  width: 300
+  max_cols: 5
+cards:
+  - type: custom:mushroom-light-card
+    entity: switch.dining_room_light_hs200
+    name: Light
+    fill_container: true
+    collapsible_controls: true
+    secondary_info: last-changed
+    layout: horizontal
+
+
+# siren.dinning_room_siren
+# sensor.dinning_room_volume
+# sensor.dinning_room_wifi_signal_category
+# sensor.dinning_room_wifi_signal_strength

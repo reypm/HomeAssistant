@@ -1,0 +1,56 @@
+---
+# Sensors
+# https://www.home-assistant.io/integrations/sensor/
+
+#- platform: qnap
+#  host: !secret qnap_host
+#  username: !secret qnap_username
+#  password: !secret qnap_password
+#  monitored_conditions:
+#    - status
+#    - system_temp
+#    - cpu_temp
+#    - cpu_usage
+#    - memory_used
+#    - memory_percent_used
+#    - network_link_status
+#    - network_tx
+#    - network_rx
+#    - drive_smart_status
+#    - drive_temp
+#    - volume_percentage_used
+
+## Integration Energy Sensors
+- platform: template
+  sensors:
+    # convert value from add-in into statistic
+    water_meter_total_gal:
+      friendly_name: "Total Water Consumption"
+      device_class: water
+      unit_of_measurement: gal
+      value_template: "{{ (states('sensor.water_meter_consumption') | float)  }}"
+      attribute_templates:
+        state_class: total_increasing
+
+- platform: template
+  sensors:
+    devices_with_low_battery:
+      friendly_name: "Devices with Low Battery"
+      unit_of_measurement: devices
+      value_template: >-
+        {% set ignore_entities = [] %}
+        {{ states.sensor
+          | selectattr('attributes.device_class', 'eq', 'battery')
+          | rejectattr('entity_id', 'in', ignore_entities)
+          | map(attribute='state')
+          | reject('in', ['unknown', 'unavailable'])
+          | map('int', -1) | select('le', 30)
+          | select('ge', 0)
+          | list | count
+        }}
+      icon_template: >-
+        {% if is_state('sensor.devices_with_low_battery', '0') %}
+          mdi:battery-check
+        {% else %}
+          mdi:battery-alert
+        {% endif %}

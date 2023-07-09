@@ -1,0 +1,66 @@
+title: Outdoor Cameras
+path: cctv
+icon: mdi:cctv
+type: custom:horizontal-layout
+layout:
+  max_cols: 1
+cards:
+  - type: grid
+    square: false
+    columns: 2
+    cards:
+      - type: custom:webrtc-camera
+        entity: camera.office_corner_sub
+        muted: true
+        background: true
+        mode: webrtc,mse,mp4,mjpeg
+      - type: custom:webrtc-camera
+        entity: camera.front_side_right_corner_sub
+        muted: true
+        background: true
+        mode: webrtc,mse,mp4,mjpeg
+
+  - type: grid
+    square: false
+    columns: 2
+    cards:
+      - type: custom:webrtc-camera
+        entity: camera.garage_sub
+        muted: true
+        background: true
+        mode: webrtc,mse,mp4,mjpeg
+      - type: custom:webrtc-camera
+        entity: camera.front_right_sub
+        muted: true
+        background: true
+        mode: webrtc,mse,mp4,mjpeg
+
+  - type: grid
+    square: false
+    columns: 2
+    cards:
+      - type: custom:webrtc-camera
+        entity: camera.front_left_side_corner_sub
+        muted: true
+        background: true
+        mode: webrtc,mse,mp4,mjpeg
+      - type: custom:webrtc-camera
+        entity: camera.back_left_side_corner_sub
+        muted: true
+        background: true
+        mode: webrtc,mse,mp4,mjpeg
+
+  - type: grid
+    square: false
+    columns: 2
+    cards:
+      - type: custom:webrtc-camera
+        entity: camera.left_side_rear_sub
+        muted: true
+        background: true
+        mode: webrtc,mse,mp4,mjpeg
+      - type: custom:webrtc-camera
+        entity: camera.patio_pool_sub
+        muted: true
+        background: true
+        mode: webrtc,mse,mp4,mjpeg

@@ -1,0 +1,25 @@
+title: Guest Room
+path: guest_room
+icon: mdi:bed-single
+type: custom:horizontal-layout
+layout:
+  width: 300
+  max_cols: 5
+cards:
+  - type: custom:mushroom-light-card
+    entity: light.guest_room
+    name: Light
+    fill_container: true
+    collapsible_controls: true
+    secondary_info: last-changed
+    layout: horizontal
+
+  - type: custom:mushroom-fan-card
+    entity: fan.guest_room
+    name: Fan
+    icon_animation: true
+    show_percentage_control: true
+    collapsible_controls: true
+    fill_container: true
+    secondary_info: last-changed
+    layout: horizontal

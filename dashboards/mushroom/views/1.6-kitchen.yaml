@@ -1,0 +1,149 @@
+title: Kitchen
+path: kitchen
+icon: mdi:countertop
+type: custom:horizontal-layout
+layout:
+  max_cols: 1
+cards:
+  - type: custom:mushroom-chips-card
+    chips:
+      - type: template
+        entity: light.kitchen_lights
+        content: >
+          {{ expand(states.group.kitchen_lights) | selectattr('state', 'eq', 'on') | list | count }}
+        icon_color: '{{ ''amber'' if is_state(entity, ''on'') else ''grey'' }}'
+        icon: mdi:lightbulb
+        tap_action:
+          action: fire-dom-event
+          browser_mod:
+            service: browser_mod.popup
+            data:
+              title: Lights On
+              content:
+                type: custom:auto-entities
+                filter:
+                  include:
+                    - group: group.kitchen_lights
+                      state: 'on'
+                      options:
+                        type: custom:mushroom-light-card
+                        show_brightness_control: true
+                        layout: horizontal
+                        tap_action:
+                          action: toggle
+                        use_light_color: true
+                    - entity_id: group.kitchen_lights
+                      state: 'on'
+                      options:
+                        type: custom:mushroom-light-card
+                        layout: horizontal
+                        secondary_info: none
+                        tap_action:
+                          action: toggle
+                        card_mod:
+                          style: |
+                            ha-card {
+                              background: color-mix(in srgb, rgb(var(--rgb-state-light)) 10%, var(--card-background-color));
+                            }
+                            :host {
+                              margin: 0px 0px 12px !important;
+                            }
+                  exclude: [ ]
+                card:
+                  type: custom:layout-card
+                  cards: [ ]
+                  layout_type: masonry
+                sort:
+                  method: friendly_name
+              card_mod:
+                style: |
+                  .content {
+                    margin: -24px -16px -24px -16px !important;
+                    --ha-card-border-width: 0;
+                    --ha-card-background: none;
+                    --ha-card-box-shadow: 0;
+                    --masonry-view-card-margin: -12px 0px 0px 0px;
+                  }
+    alignment: end
+
+  - type: custom:stack-in-card
+    cards:
+      - type: custom:mushroom-light-card
+        entity: switch.kitchen_light
+        fill_container: true
+        layout: horizontal
+        show_brightness_control: true
+        use_light_color: true
+      - type: custom:mushroom-light-card
+        entity: light.dinning_table_light
+        fill_container: true
+        layout: horizontal
+        show_brightness_control: true
+        use_light_color: true
+      - type: custom:mushroom-light-card
+        entity: light.kitchen_first_dimmer
+        fill_container: true
+        layout: horizontal
+        show_brightness_control: true
+        use_light_color: true
+      - type: custom:mushroom-light-card
+        entity: light.kitchen_second_dimmer
+        fill_container: true
+        layout: horizontal
+        show_brightness_control: true
+        use_light_color: true
+      - type: custom:mushroom-light-card
+        entity: light.patio_main_light #switch.patio_main_light
+        fill_container: true
+        layout: horizontal
+      - type: custom:mushroom-light-card
+        entity: light.patio_light_fan #switch.patio_light_fan
+        fill_container: true
+        layout: horizontal
+      - type: custom:mushroom-light-card
+        entity: light.pool_light #switch.pool_light
+        fill_container: true
+        layout: horizontal
+      - type: custom:mushroom-light-card
+        entity: light.dining_room_light
+        fill_container: true
+        layout: horizontal
+        show_brightness_control: true
+        use_light_color: true
+
+  - type: grid
+    square: false
+    columns: 2
+    cards:
+      - type: custom:mushroom-entity-card
+        entity: sensor.refrigerator
+        fill_container: true
+        tap_action: none
+        hold_action: none
+        double_tap_action: none
+        card_mod:
+          style: |
+            :host {
+              display: inherit;
+            }
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: binary_sensor.refrigerator_door_open
+            name: Door Status
+          - type: custom:mushroom-entity-card
+            entity: sensor.refrigerator_freezer_temp
+            name: Freezer Temperature
+          - type: custom:mushroom-entity-card
+            entity: climate.refrigerator_fridge
+            name: Fridge Temperature
+
+  - type: custom:mini-media-player
+    entity: media_player.echo_kitchen
+    name: Echo Show 8
+    icon: phu:echo-show-8-gen-2
+    artwork: full-cover
+    tts:
+      platform: alexa
+      entity_id: media_player.echo_kitchen
+

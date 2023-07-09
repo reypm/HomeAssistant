@@ -1,0 +1,3 @@
+firewall_status:
+  name: input_boolean.firewall_status
+  icon: mdi:toggle-switch
