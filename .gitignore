@@ -46,3 +46,6 @@ ozw_log.txt
 
 # ignore videos
 media/downloads/
+
+# ignore backup folder
+non_used_files_bck
