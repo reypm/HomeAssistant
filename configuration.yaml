@@ -14,8 +14,7 @@ homeassistant:
   currency: USD
   internal_url: !secret internal_url
   external_url: !secret external_url
-  media_dirs:
-    media: /config/media
+
   #customize:
   #  sensor.water_meter_consumption:
   #    device_class: water
