@@ -16,16 +16,16 @@ homeassistant:
   external_url: !secret external_url
   media_dirs:
     media: /config/media
-  customize:
-    sensor.water_meter_consumption:
-      device_class: water
-    sensor.water_meter:
-      device_class: water
-    sensor.energy_meter_consumption:
-      device_class: energy
-    sensor.energy_meter:
-      device_class: energy
-      unit_of_measurement: USD/kWh
+  #customize:
+  #  sensor.water_meter_consumption:
+  #    device_class: water
+  #  sensor.water_meter:
+  #    device_class: water
+  #  sensor.energy_meter_consumption:
+  #    device_class: energy
+  #  sensor.energy_meter:
+  #    device_class: energy
+  #    unit_of_measurement: USD/kWh
 
 default_config:
 wake_on_lan:
@@ -122,3 +122,24 @@ group: !include includes/groups/groups.yaml
 #    custom_components.localtuya.pytuya: debug
 #pyatv: debug
 #homeassistant.components.apple_tv: debug
+
+utility_meter:
+  hourly_energy:
+    source: sensor.energy_meter
+    cycle: hourly
+  daily_energy:
+    source: sensor.energy_meter
+    cycle: daily
+  monthly_energy:
+    source: sensor.energy_meter
+    cycle: monthly
+
+  hourly_water:
+    source: sensor.water_meter
+    cycle: hourly
+  daily_water:
+    source: sensor.water_meter
+    cycle: daily
+  monthly_water:
+    source: sensor.water_meter
+    cycle: monthly

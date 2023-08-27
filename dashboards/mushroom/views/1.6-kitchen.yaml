@@ -11,7 +11,7 @@ cards:
         entity: light.kitchen_lights
         content: >
           {{ expand(states.group.kitchen_lights) | selectattr('state', 'eq', 'on') | list | count }}
-        icon_color: '{{ ''amber'' if is_state(entity, ''on'') else ''grey'' }}'
+        icon_color: "{{ 'amber' if is_state(entity, 'on') else 'grey' }}"
         icon: mdi:lightbulb
         tap_action:
           action: fire-dom-event
@@ -24,7 +24,7 @@ cards:
                 filter:
                   include:
                     - group: group.kitchen_lights
-                      state: 'on'
+                      state: "on"
                       options:
                         type: custom:mushroom-light-card
                         show_brightness_control: true
@@ -33,7 +33,7 @@ cards:
                           action: toggle
                         use_light_color: true
                     - entity_id: group.kitchen_lights
-                      state: 'on'
+                      state: "on"
                       options:
                         type: custom:mushroom-light-card
                         layout: horizontal
@@ -48,10 +48,10 @@ cards:
                             :host {
                               margin: 0px 0px 12px !important;
                             }
-                  exclude: [ ]
+                  exclude: []
                 card:
                   type: custom:layout-card
-                  cards: [ ]
+                  cards: []
                   layout_type: masonry
                 sort:
                   method: friendly_name
@@ -65,6 +65,19 @@ cards:
                     --masonry-view-card-margin: -12px 0px 0px 0px;
                   }
     alignment: end
+
+  - type: grid
+    columns: 2
+    square: false
+    cards:
+      - type: custom:mushroom-entity-card
+        entity: switch.smartplug_kitchen_1_switch
+        name: Coffee Maker SmartPlug
+        tap_action:
+          action: toggle
+        double_tap_action:
+          action: none
+        fill_container: true
 
   - type: custom:stack-in-card
     cards:
@@ -146,4 +159,3 @@ cards:
     tts:
       platform: alexa
       entity_id: media_player.echo_kitchen
-

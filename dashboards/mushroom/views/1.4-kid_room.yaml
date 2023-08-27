@@ -74,6 +74,30 @@ cards:
             --chip-border-width: 0;
           }
 
+  - type: grid
+    columns: 2
+    square: false
+    cards:
+      - type: custom:mushroom-entity-card
+        entity: switch.kid_bedroom_smart_outlet_1
+        name: AppleTv/SamsungTv Outlet
+        tap_action:
+          action: toggle
+        double_tap_action:
+          action: none
+        fill_container: true
+        #layout: vertical
+
+      - type: custom:mushroom-entity-card
+        entity: switch.kid_bedroom_smart_outlet_2
+        name: Nintendo Switch OLED Outlet
+        tap_action:
+          action: toggle
+        double_tap_action:
+          action: none
+        fill_container: true
+        #layout: vertical
+
   - type: custom:stack-in-card
     cards:
       - type: custom:mushroom-light-card
@@ -110,14 +134,15 @@ cards:
       platform: alexa
       entity_id: media_player.kid_echo
 
+  # remote.58s470g
   - type: custom:mini-media-player
-    entity: media_player.tv_kid_bedroom
+    entity: media_player.58s470g
     icon: phu:lg-oled55
-    name: Samsung 5 Series (40)[UN40N5200AFXZA]
+    name: TCL 58S470G
     sound_mode: full
-    volume_step: 2
-    max_volume: 35
-    min_volume: 6
+    volume_step: 5
+    max_volume: 30
+    min_volume: 14
     card_mod:
       style: |
         ha-card {

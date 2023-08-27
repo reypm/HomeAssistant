@@ -22,6 +22,28 @@ cards:
         show_percentage_control: true
         name: Fan
 
+  - type: grid
+    columns: 2
+    square: false
+    cards:
+      - type: custom:mushroom-entity-card
+        entity: switch.smartplug_office_devices_switch
+        name: Office Devices SmartPlug
+        tap_action:
+          action: toggle
+        double_tap_action:
+          action: none
+        fill_container: true
+
+      - type: custom:mushroom-entity-card
+        entity: switch.smartplug_network_devices_switch
+        name: Network Devices SmartPlug
+        tap_action:
+          action: toggle
+        double_tap_action:
+          action: none
+        fill_container: true
+
   - type: custom:vertical-stack-in-card
     icon: mdi:network
     cards:
@@ -114,9 +136,6 @@ cards:
           {% from 'pfsense_tools.jinja' import pfsense_network_icon_color %}
           {{ pfsense_network_icon_color('sensor.pfsense_interface_lan_status') }}
 
-
-
-
   - type: grid
     square: false
     columns: 2
@@ -201,6 +220,29 @@ cards:
           - entity: sensor.homeofficenas_network_down_eth1
             name: eth1 Down
 
+  - type: custom:stack-in-card
+    title: CP1500AVRLCDa (Devices UPS)
+    cards:
+      - type: custom:mushroom-entity-card
+        entity: sensor.qnapups_battery_charge
+        #name: System Status
+
+      - type: custom:mushroom-entity-card
+        entity: sensor.qnapups_load
+        #name: System Temperature
+
+      - type: custom:mushroom-entity-card
+        entity: sensor.qnapups_status
+        #name: CPU Usage
+
+      - type: custom:mushroom-entity-card
+        entity: sensor.qnapups_status_data
+        #name: Volume Usage
+
+      - type: custom:mushroom-entity-card
+        entity: sensor.qnapups_input_voltage
+        #name: Memory Usage
+
   - type: custom:vertical-stack-in-card
     title: Canon TR8600 Series
     icon: mdi:nas
@@ -245,7 +287,7 @@ cards:
         entity: sensor.canon_tr8600_series_magenta
         name: Magenta Ink Level
         icon: mdi:water-check
-        icon_color: '#FF00FF'
+        icon_color: "#FF00FF"
         fill_container: true
         tap_action:
           action: more-info
