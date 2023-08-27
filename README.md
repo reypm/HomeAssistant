@@ -1,22 +1,23 @@
 # Welcome !
 
+![Config Check](https://github.com/reypm/HomeAssistant/workflows/config-check.yaml/badge.svg)
+
 This is my Home Automation Repository.
 Currently, it represents the root of my home assistant installation.
 
-## Software
+## HACS Integrations
 
-It is built using the following components:
+Below is the list of the current integrations I am using on my HA instance from HACS:
 
-- [lovelace-mushroom](https://github.com/piitaya/lovelace-mushroom)
-- [card_mod](https://github.com/thomasloven/lovelace-card-mod)
-- [layout_card](https://github.com/thomasloven/lovelace-layout-card)
-- [vertical-stack-in-card](https://github.com/ofekashery/vertical-stack-in-card)
-- browser_mod
-- [lovelace_gen](https://github.com/thomasloven/hass-lovelace_gen)
-- [magic_areas](https://github.com/jseidl/hass-magic_areas)
-- [frigate-hass-card](https://github.com/dermotduffy/frigate-hass-card)
-- [weather-card](https://github.com/bramkragten/weather-card)
-- [bar-card](https://github.com/custom-cards/bar-card)
-- [mini-media-player](https://github.com/kalkih/mini-media-player)
-- [custom-brand-icons](https://github.com/elax46/custom-brand-icons)
-- [mini-graph-card](https://github.com/kalkih/mini-graph-card)
+- [Node-RED Companion](https://github.com/zachowj/hass-node-red)
+- [browser_mod](https://github.com/thomasloven/hass-browser_mod)
+- [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control)
+- [Energy meter](https://github.com/zeronounours/HA-custom-component-energy-meter)
+- [Local Tuya](https://github.com/rospogrigio/localtuya)
+- [pfsense Gateways](https://github.com/sdrapha/home-assistant-custom-components-pfsense-gateways)
+- [Custom Templates](https://github.com/PiotrMachowski/Home-Assistant-custom-components-Custom-Templates)
+- [pfSense integration for Home Assistant](https://github.com/travisghansen/hass-pfsense)
+- [SmartThinQ LGE Sensors](https://github.com/ollo69/ha-smartthinq-sensors)
+- [WebRTC Camera](https://github.com/AlexxIT/WebRTC)
+- [govee](https://github.com/LaggAt/hacs-govee)
+- [Alexa Media Player](https://github.com/custom-components/alexa_media_player)
