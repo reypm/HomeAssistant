@@ -43,3 +43,6 @@ lib
 home-assistant.log
 home-assistant.log.*
 ozw_log.txt
+
+# ignore videos
+media/downloads/
