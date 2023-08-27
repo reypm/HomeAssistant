@@ -1,6 +1,6 @@
 # Welcome !
 
-![Config Check](https://github.com/reypm/HomeAssistant/workflows/config-check.yaml/badge.svg)
+![Config Check](https://github.com/reypm/HomeAssistant/actions/workflows/config-check.yaml/badge.svg)
 
 This is my Home Automation Repository.
 Currently, it represents the root of my home assistant installation.
