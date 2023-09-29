@@ -7,13 +7,13 @@ cards:
   - type: custom:stack-in-card
     cards:
       - type: custom:mushroom-light-card
-        entity: light.laundry_motion_switch_ks200m
+        entity: switch.laundry_motion_light
         fill_container: true
         layout: horizontal
         show_brightness_control: true
         use_light_color: true
       - type: custom:mushroom-light-card
-        entity: light.garage_motion_switch_ks200m
+        entity: light.garage_light
         fill_container: true
         layout: horizontal
         show_brightness_control: true
@@ -43,10 +43,6 @@ cards:
             entity: sensor.dryer_current_course
           - type: custom:mushroom-entity-card
             entity: binary_sensor.dryer_dry_completed
-          - type: custom:mushroom-entity-card
-            entity: sensor.dryer_remaining_time
-          - type: custom:mushroom-entity-card
-            entity: binary_sensor.dryer_remote_start
 
   - type: grid
     square: false
@@ -67,7 +63,3 @@ cards:
             entity: sensor.top_load_washer_current_course
           - type: custom:mushroom-entity-card
             entity: binary_sensor.top_load_washer_wash_completed
-          - type: custom:mushroom-entity-card
-            entity: sensor.top_load_washer_remaining_time
-          - type: custom:mushroom-entity-card
-            entity: binary_sensor.top_load_washer_remote_start

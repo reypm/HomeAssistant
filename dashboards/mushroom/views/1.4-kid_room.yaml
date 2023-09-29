@@ -86,7 +86,6 @@ cards:
         double_tap_action:
           action: none
         fill_container: true
-        #layout: vertical
 
       - type: custom:mushroom-entity-card
         entity: switch.kid_bedroom_smart_outlet_2
@@ -96,7 +95,6 @@ cards:
         double_tap_action:
           action: none
         fill_container: true
-        #layout: vertical
 
   - type: custom:stack-in-card
     cards:
@@ -125,35 +123,161 @@ cards:
     background: true
     mode: webrtc,mse,mp4,mjpeg
 
-  - type: custom:mini-media-player
-    entity: media_player.kid_echo
-    name: Echo Show 5
-    icon: phu:echo-show-5-gen-2
-    artwork: full-cover
-    tts:
-      platform: alexa
-      entity_id: media_player.kid_echo
+  #  - type: custom:mini-media-player
+  #    entity: media_player.kid_echo
+  #    name: Echo Show 5
+  #    icon: phu:echo-show-5-gen-2
+  #    artwork: full-cover
+  #    tts:
+  #      platform: alexa
+  #      entity_id: media_player.kid_echo
 
-  # remote.58s470g
-  - type: custom:mini-media-player
-    entity: media_player.58s470g
-    icon: phu:lg-oled55
-    name: TCL 58S470G
-    sound_mode: full
-    volume_step: 5
-    max_volume: 30
-    min_volume: 14
-    card_mod:
-      style: |
-        ha-card {
-          padding: 10px;
-        }
+  #  # remote.58s470g
+  #  - type: custom:mini-media-player
+  #    entity: media_player.58s470g
+  #    icon: phu:lg-oled55
+  #    name: TCL 58S470G
+  #    sound_mode: full
+  #    volume_step: 5
+  #    max_volume: 30
+  #    min_volume: 14
+  #    card_mod:
+  #      style: |
+  #        ha-card {
+  #          padding: 10px;
+  #        }
+  #
+  #  - type: grid
+  #    square: false
+  #    columns: 1
+  #    cards:
+  #      - type: entities
+  #        entities:
+  #          - remote.58s470g
+  #        title: 58S470G
+  #      - type: custom:mushroom-media-player-card
+  #        entity: media_player.58s470g
+  #        use_media_info: true
+  #        show_volume_level: true
+  #
+  #  # AppleTV (1st Gen)
+  #  - type: custom:mini-media-player
+  #    entity: media_player.atv_kid_bedroom
+  #    icon: phu:apple-tv-box
+  #    artwork: full-cover
+  #    volume_stateless: true
+  #    source: full
+  #    info: scroll
 
-  # AppleTV (1st Gen)
-  - type: custom:mini-media-player
-    entity: media_player.atv_kid_bedroom
-    icon: phu:apple-tv-box
-    artwork: full-cover
-    volume_stateless: true
-    source: full
-    info: scroll
+  # Tv
+  - type: grid
+    square: false
+    columns: 1
+    cards:
+      - type: custom:android-tv-card
+        remote_id: remote.kid_room_remote_58s470g
+        media_player_id: media_player.kid_room_58s470g
+        title: Remote
+        rows:
+          - - back
+            - power
+            - home
+          - - keyboard
+            - search
+            - volume_slider
+          - - - netflix
+              - null
+              - youtube
+              - null
+              - spotify
+            - navigation_touchpad
+          - - previous
+            - play_pause
+            - next
+      - type: custom:stack-in-card
+        cards:
+          - type: custom:mushroom-media-player-card
+            entity: media_player.kid_room_58s470g
+            icon: mdi:play
+            use_media_info: true
+            use_media_artwork: false
+            show_volume_level: false
+            media_controls:
+              - play_pause_stop
+              - previous
+              - next
+            volume_controls:
+              - volume_buttons
+              - volume_set
+            fill_container: false
+            card_mod:
+              style: |
+                mushroom-shape-icon {
+                  {% set media_type = state_attr(config.entity, 'media_content_type') %}
+                  --card-mod-icon: 
+                  {% if media_type == 'tvshow' %}
+                    mdi:television-classic
+                  {% elif media_type == 'movie' %}
+                    mdi:movie-open
+                  {% elif media_type == 'music' %}
+                    mdi:music
+                  {% elif media_type == 'playlist' %}
+                    mdi:music
+                  {% else %}
+                    mdi:play
+                  {% endif %};   
+                }
+          - type: conditional
+            conditions:
+              - entity: media_player.kid_room_58s470g
+                state_not: "off"
+              - entity: media_player.kid_room_58s470g
+                state_not: idle
+            card:
+              entity: media_player.kid_room_58s470g
+              hide:
+                icon: true
+                name: true
+                runtime: true
+                source: true
+                power: true
+                state_label: true
+                volume: true
+                info: true
+                progress: false
+                controls: true
+              more_info: false
+              type: custom:mini-media-player
+              toggle_power: false
+              group: true
+              card_mod:
+                style:
+                  mmp-progress$: |
+                    paper-progress {
+                      {{ '--paper-progress-container-color: rgba(63, 81, 181, 0.2) !important;' if is_state(config.entity, 'playing') }}
+                    }
+                  .: |
+                    ha-card {
+                      margin: 0px 12px 12px;
+                      --mmp-progress-height: 42px !important;
+                      height: var(--mmp-progress-height);
+                      --mmp-accent-color: rgb(63, 81, 181);
+                      --ha-card-border-radius: 12px;
+                    }
+        card_mod:
+          style: |
+            ha-card {
+              {% if not is_state('media_player.kid_room_58s470g', 'off') and not is_state('media_player.kid_room_58s470g', 'idle') %}
+                background: url( '{{ state_attr("media_player.kid_room_58s470g", "entity_picture") }}' ), linear-gradient(to left, transparent, rgb(var(--rgb-card-background-color)) 50%);
+
+                {% if state_attr('media_player.kid_room_58s470g', 'media_content_type') == 'tvshow' %}
+                  background-size: auto 100%, cover;
+                {% else %}
+                  background-size: 50% auto, cover;
+                {% endif %}
+
+                background-position: right;
+                background-repeat: no-repeat;
+                background-blend-mode: saturation;
+              {% endif %}
+            }

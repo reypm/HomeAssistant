@@ -83,6 +83,9 @@ lovelace:
     # https://github.com/madmicio/LG-WebOS-Remote-Control
     #- url: /hacsfiles/LG-WebOS-Remote-Control/lg-remote-control.js
     #  type: module
+    # Android Tv Card (https://github.com/Nerwyn/android-tv-card)
+    - url: /hacsfiles/android-tv-card/android-tv-card.js
+      type: module
 
   # https://github.com/NemesisRE/kiosk-mode
   # kiosk_mode:

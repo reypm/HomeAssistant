@@ -8,7 +8,7 @@
       icon: mdi:counter
       state_class: total_increasing
       device_class: energy
-      unit_of_measurement: USD/kWh
+      unit_of_measurement: USD
       state: >
         {% set consumption=states('sensor.energy_meter_consumption')|float(0) %}
         {% set fuel_adjustment=consumption*0.04260 %}

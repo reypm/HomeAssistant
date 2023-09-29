@@ -36,7 +36,7 @@ all_devices:
 
     - light.kitchen_light_hs210 #switch.kitchen_light_hs210
     - light.laundry_motion_switch_ks200m #switch.laundry_motion_switch_ks200m
-#    - light.outside_light #light.outside_light
+    #    - light.outside_light #light.outside_light
     - light.patio_light #switch.patio_fan_light_hs200
     - light.porch_light #switch.porch_lights_hs200
     - light.kid_bedroom_walkin_closet #switch.kid_bedroom_walkin_closet
@@ -50,9 +50,9 @@ all_devices:
 all_atv:
   name: All AppleTv Devices
   entities:
-    - media_player.atv_kid_bedroom
     - media_player.atv_living_room
     - media_player.atv_master_bedroom
+    - media_player.atv_kid_bedroom
 
 ##Lights
 all_lights:
