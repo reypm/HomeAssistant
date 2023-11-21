@@ -973,7 +973,3 @@ cards:
               state: false
               legend: false
               fill: fade
-
-  - type: custom:mushroom-cover-card
-    entity: cover.garage_door
-    show_buttons_control: true
