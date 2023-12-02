@@ -1,72 +1,89 @@
 actions:
-  - name: OFFICE_ALL_ON
+  # Family Room Actions
+  - name: FR_MEDIA_ON
     background_color: "#000000"
     label:
-      text: "Office On"
+      text: "FR Media ON"
       color: "#ff0000"
     icon:
-      icon: mdi:clock-start
+      icon: mdi:television
       color: "#ffffff"
 
-  - name: OFFICE_ALL_OFF
+  - name: FR_MEDIA_OFF
     background_color: "#000000"
     label:
-      text: "Office Off"
-      color: "#ff0000"
-    icon:
-      icon: mdi:check-all
-      color: "#ffffff"
-
-  - name: BEDTIME
-    background_color: "#000000"
-    label:
-      text: "Bed Time"
-      color: "#ff0000"
-    icon:
-      icon: mdi:power-sleep
-      color: "#ffffff"
-
-  - name: KID_ROOM_ALL_OFF
-    background_color: "#000000"
-    label:
-      text: "KidRoom Off"
-      color: "#ff0000"
-    icon:
-      icon: mdi:clock-end
-      color: "#ffffff"
-
-  - name: FR_MOVIE_TIME_ON
-    background_color: "#000000"
-    label:
-      text: "Movie Time"
-      color: "#ff0000"
-    icon:
-      icon: mdi:movie-play
-      color: "#ffffff"
-
-  - name: FR_MOVIE_TIME_OFF
-    background_color: "#000000"
-    label:
-      text: "Movie Off"
+      text: "FR Media OFF"
       color: "#ff0000"
     icon:
       icon: mdi:television-off
       color: "#ffffff"
-
-  - name: MR_MOVIE_TIME_ON
+  - name: FR_FAN_ON
     background_color: "#000000"
     label:
-      text: "Bedroom Movie Time"
+      text: "FR Fan ON"
       color: "#ff0000"
     icon:
-      icon: mdi:youtube-tv
+      icon: mdi:fan
       color: "#ffffff"
-
-  - name: MR_MOVIE_TIME_OFF
+  - name: FR_FAN_OFF
     background_color: "#000000"
     label:
-      text: "Bedroom Movie Off"
+      text: "FR Fan OFF"
       color: "#ff0000"
     icon:
-      icon: mdi:television-off
+      icon: mdi:fan-off
       color: "#ffffff"
+#  - name: OFFICE_ALL_ON
+#    background_color: "#000000"
+#    label:
+#      text: "Office On"
+#      color: "#ff0000"
+#    icon:
+#      icon: mdi:clock-start
+#      color: "#ffffff"
+#
+#  - name: OFFICE_ALL_OFF
+#    background_color: "#000000"
+#    label:
+#      text: "Office Off"
+#      color: "#ff0000"
+#    icon:
+#      icon: mdi:check-all
+#      color: "#ffffff"
+#
+#  - name: BEDTIME
+#    background_color: "#000000"
+#    label:
+#      text: "Bed Time"
+#      color: "#ff0000"
+#    icon:
+#      icon: mdi:power-sleep
+#      color: "#ffffff"
+#
+#  - name: KID_ROOM_ALL_OFF
+#    background_color: "#000000"
+#    label:
+#      text: "KidRoom Off"
+#      color: "#ff0000"
+#    icon:
+#      icon: mdi:clock-end
+#      color: "#ffffff"
+#
+#  - name: FR_MOVIE_TIME_ON
+#    background_color: "#000000"
+#    label:
+#      text: "Movie Time"
+#      color: "#ff0000"
+#    icon:
+#      icon: mdi:movie-play
+#      color: "#ffffff"
+#
+#  - name: FR_MOVIE_TIME_OFF
+#    background_color: "#000000"
+#    label:
+#      text: "Movie Off"
+#      color: "#ff0000"
+#    icon:
+#      icon: mdi:television-off
+#      color: "#ffffff"
+#

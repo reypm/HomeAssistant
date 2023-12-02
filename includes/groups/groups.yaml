@@ -15,7 +15,6 @@ all_devices:
 
     # Lights
     - light.bathroom_dimmer
-
     - light.guest_room
     - light.kid_bedroom
     - light.kitchen_first_dimmer_hs220
@@ -29,11 +28,8 @@ all_devices:
     - light.bathroom_light #switch.bathroom_light
     - light.dining_room_light #switch.dining_room_light
     - light.dinning_table_light #switch.dinning_table_light
-
     - light.entrance_light #switch.enttrance_light_hs200
-
     - light.garage_light #switch.garage_light
-
     - light.kitchen_light_hs210 #switch.kitchen_light_hs210
     - light.laundry_motion_switch_ks200m #switch.laundry_motion_switch_ks200m
     #    - light.outside_light #light.outside_light
@@ -47,6 +43,7 @@ all_devices:
     - media_player.lg_soundbar_sp9ya
     - media_player.lg_tv_living_room
     - media_player.lg_tv_master_bedroom
+
 all_atv:
   name: All AppleTv Devices
   entities:
@@ -79,6 +76,7 @@ all_lights:
     - light.patio_light # switch.patio_fan_light_hs200
     - light.porch_light # switch.porch_lights_hs200
     - light.kid_bedroom_walkin_closet # switch.kid_bedroom_walkin_closet
+
 kitchen_lights:
   name: Kitchen Lights
   entities:
@@ -86,22 +84,26 @@ kitchen_lights:
     - light.kitchen_second_dimmer_hs220
     - light.kitchen_light_hs210 # switch.kitchen_light_hs210
     - light.dinning_table_light # switch.kitchen_second_light
+
 kid_room_lights:
   name: Kid Room Lights
   entities:
     - light.kid_bedroom
     - light.kid_bedroom_walkin_closet # switch.kid_bedroom_walkin_closet
+
 family_room_lights:
   name: Living Room Lights
   entities:
     - light.family_room
     - light.rgbic_tv_backlight
+
 master_room_lights:
   name: Master Room Lights
   entities:
     - light.bathroom_dimmer
     - light.bathroom_light
     - light.master_bedroom
+
 lights_to_be_turn_off_on_bedtime:
   name: Lights to be turn off on Bedtime
   entities:
@@ -134,11 +136,13 @@ all_fans:
     - fan.family_room
     - fan.master_bedroom
     - fan.home_office
+
 bedroom_fans:
   name: Bedroom Fans
   entities:
     - fan.kid_bedroom
     - fan.master_bedroom
+
 fans_turn_off_bedtime:
   name: Fans to Turn Off on Bedtime
   entities:
@@ -158,19 +162,25 @@ office_window_sensors_battery_state:
     - sensor.office_window_right_side_battery
 
 ##Windows
-all_windows:
-  name: All Window Sensors
+all_sensors:
+  name: All Sensors
   entities:
     - binary_sensor.sliding_door_kitchen
     - binary_sensor.sliding_door_master_room
-    - binary_sensor.office_window_right_side
     - binary_sensor.office_window_left_side
+    - binary_sensor.office_window_right_side
 
-external_doors:
-  name: External Doors
+doors_sensors:
+  name: External Doors Sensors
   entities:
     - binary_sensor.sliding_door_kitchen
     - binary_sensor.sliding_door_master_room
+
+windows_sensors:
+  name: Windows Sensors
+  entities:
+    - binary_sensor.office_window_left_side
+    - binary_sensor.office_window_right_side
 
 ##Echo Devices
 all_echo_devices:
