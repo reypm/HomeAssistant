@@ -175,7 +175,7 @@ cards:
     columns: 1
     cards:
       - type: custom:android-tv-card
-        remote_id: remote.kid_room_remote_58s470g
+        remote_id: remote.kid_room_58s470g
         media_player_id: media_player.kid_room_58s470g
         title: Remote
         rows:
