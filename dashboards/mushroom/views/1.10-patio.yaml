@@ -1,6 +1,6 @@
-title: Home
-path: home_view
-icon: mdi:home
+title: Patio
+path: patio_view
+icon: mdi:pool
 type: custom:horizontal-layout
 layout:
   max_cols: 2

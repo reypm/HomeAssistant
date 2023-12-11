@@ -15,17 +15,6 @@ homeassistant:
   internal_url: !secret internal_url
   external_url: !secret external_url
 
-  #customize:
-  #  sensor.water_meter_consumption:
-  #    device_class: water
-  #  sensor.water_meter:
-  #    device_class: water
-  #  sensor.energy_meter_consumption:
-  #    device_class: energy
-  #  sensor.energy_meter:
-  #    device_class: energy
-  #    unit_of_measurement: USD/kWh
-
 default_config:
 wake_on_lan:
 
@@ -77,33 +66,9 @@ lovelace:
       type: module
     - url: /hacsfiles/kiosk-mode/kiosk-mode.js
       type: module
-    # https://github.com/flixlix/power-flow-card-plus
-    #- url: /hacsfiles/power-flow-card-plus/power-flow-card-plus.js
-    #  type: module
-    # https://github.com/madmicio/LG-WebOS-Remote-Control
-    #- url: /hacsfiles/LG-WebOS-Remote-Control/lg-remote-control.js
-    #  type: module
     # Android Tv Card (https://github.com/Nerwyn/android-tv-card)
     - url: /hacsfiles/android-tv-card/android-tv-card.js
       type: module
-
-  # https://github.com/NemesisRE/kiosk-mode
-  # kiosk_mode:
-  #hide_header: false
-  #hide_sidebar: false
-  #hide_menubutton: false
-  #hide_overflow: false
-  #hide_account: true
-  #hide_search: true
-  #ignore_entity_settings: false
-  #ignore_mobile_settings: false
-  #mobile_settings:
-  # hide_header: false
-  # hide_sidebar: false
-  # hide_menubutton: false
-  # hide_account: true
-  # hide_search: true
-  # custom_width: 768
 
 sensor: !include_dir_list includes/sensors/
 automation: !include includes/automation/automations.yaml

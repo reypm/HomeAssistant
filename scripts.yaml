@@ -1,9 +1,0 @@
-test:
-  alias: test
-  sequence:
-  - service: fan.increase_speed
-    data:
-      percentage_step: 25
-    target:
-      device_id: 9d619875a573ed84d7ad0cb444f3f425
-  mode: single
