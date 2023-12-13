@@ -104,6 +104,13 @@ master_room_lights:
     - light.bathroom_light
     - light.master_bedroom
 
+patio_lights:
+  name: Patio & Pool Lights
+  entities:
+    - light.patio_light_fan #switch.patio_light_fan
+    - light.patio_main_light #switch.patio_main_light
+    - light.pool_light #switch.pool_light
+
 lights_to_be_turn_off_on_bedtime:
   name: Lights to be turn off on Bedtime
   entities:
