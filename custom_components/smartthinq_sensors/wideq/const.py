@@ -1,6 +1,6 @@
 """LG SmartThinQ constants."""
 
-from .core_enum import StrEnum
+from .backports.enum import StrEnum
 
 # default core settings
 DEFAULT_COUNTRY = "US"
@@ -121,7 +121,6 @@ class WashDeviceFeatures(StrEnum):
     DELAYSTART = "delay_start"
     DETERGENT = "detergent"
     DETERGENTLOW = "detergent_low"
-    DOORCLOSE = "door_close"
     DOORLOCK = "door_lock"
     DOOROPEN = "door_open"
     DRYLEVEL = "dry_level"
