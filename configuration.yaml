@@ -21,8 +21,8 @@ wake_on_lan:
 tts:
   - platform: google_translate
 
-downloader:
-  download_dir: /config/media/downloads
+#downloader:
+#  download_dir: /config/media/downloads
 
 ## Frontend
 frontend:
