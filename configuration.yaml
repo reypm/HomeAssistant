@@ -21,9 +21,6 @@ wake_on_lan:
 tts:
   - platform: google_translate
 
-#downloader:
-#  download_dir: /config/media/downloads
-
 ## Frontend
 frontend:
   themes: !include_dir_merge_named themes/
@@ -89,6 +86,25 @@ group: !include includes/groups/groups.yaml
 #    custom_components.localtuya.pytuya: debug
 #pyatv: debug
 #homeassistant.components.apple_tv: debug
+
+## Telegram Webhooks
+telegram_bot:
+  - platform: polling
+    api_key: !secret telegram_api_key
+    #parse_mode: html
+    #trusted_networks:
+    #  - 192.168.11.0/20
+    allowed_chat_ids:
+      - !secret telegram_reynierpm_chat_id
+
+logger:
+  default: warning
+  logs:
+    custom_components.webrtc: debug
+    custom_components.localtuya: debug
+    custom_components.localtuya.pytuya: debug
+    custom_components.tapo: debug
+    custom_components.tapo_control: debug
 
 utility_meter:
   hourly_energy:
