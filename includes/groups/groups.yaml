@@ -162,6 +162,7 @@ office_window_sensors:
   entities:
     - binary_sensor.office_window_right_side
     - binary_sensor.office_window_right_side
+
 office_window_sensors_battery_state:
   name: Office Window Sensors
   entities:
@@ -211,3 +212,10 @@ devices_battery:
     - sensor.ewelink_th01_battery #Foyer
     - sensor.th_master_room_battery
     - sensor.humidity_temperature_sensor_garage_battery
+
+# Rack Fans
+rack_fans :
+  name: Rack Smart Plug
+  entities:
+    - switch.sp_top_fan_rack_switch
+    - switch.sp_bottom_fan_rack_switch_switch
