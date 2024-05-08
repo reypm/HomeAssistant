@@ -2,220 +2,66 @@
 # Groups
 # https://www.home-assistant.io/components/group/
 
-## General
-all_devices:
-  name: All House Devices
-  entities:
-    # Fans
-    - fan.guest_room
-    - fan.kid_bedroom
-    - fan.family_room
-    - fan.master_bedroom
-    - fan.home_office
-
-    # Lights
-    - light.bathroom_dimmer
-    - light.guest_room
-    - light.kid_bedroom
-    - light.kitchen_first_dimmer_hs220
-    - light.kitchen_second_dimmer_hs220
-    - light.family_room
-    - light.master_bedroom
-    - light.home_office
-    - light.rgbic_tv_backlight
-
-    # Switches
-    - light.bathroom_light #switch.bathroom_light
-    - light.dining_room_light #switch.dining_room_light
-    - light.dinning_table_light #switch.dinning_table_light
-    - light.entrance_light #switch.enttrance_light_hs200
-    - light.garage_light #switch.garage_light
-    - light.kitchen_light_hs210 #switch.kitchen_light_hs210
-    - light.laundry_motion_switch_ks200m #switch.laundry_motion_switch_ks200m
-    #    - light.outside_light #light.outside_light
-    - light.patio_light #switch.patio_fan_light_hs200
-    - light.porch_light #switch.porch_lights_hs200
-    - light.kid_bedroom_walkin_closet #switch.kid_bedroom_walkin_closet
-
-    # Media Player
-    - media_player.fire_tv_living_room
-    - media_player.fire_tv_master_bedroom
-    - media_player.lg_soundbar_sp9ya
-    - media_player.lg_tv_living_room
-    - media_player.lg_tv_master_bedroom
-
-all_atv:
-  name: All AppleTv Devices
-  entities:
-    - media_player.atv_living_room
-    - media_player.atv_master_bedroom
-    - media_player.atv_kid_bedroom
-
 ##Lights
 all_lights:
   name: All Home Lights
   entities:
-    - light.bathroom_dimmer
-    - light.bathroom_light
-    - light.guest_room
-    - light.kid_bedroom
-    - light.kitchen_first_dimmer_hs220
-    - light.kitchen_second_dimmer_hs220
-    - light.family_room
-    - light.master_bedroom
-    - light.home_office
-    - light.rgbic_tv_backlight
+    # Main Bedroom
     - light.bathroom_light # switch.bathroom_light_hs200
-    - light.dinning_room_light # switch.dining_room_light_hs200
-    - light.entrance_light # switch.enttrance_light_hs200
-    - light.garage_light # switch.garage_light
-    - light.kitchen_light_hs210 # switch.kitchen_light_hs210
-    - light.dinning_table_light # switch.kitchen_second_light
-    - light.laundry_motion_switch_ks200m # switch.laundry_motion_switch_ks200m
-    - light.outside_light # light.outside_light
-    - light.patio_light # switch.patio_fan_light_hs200
-    - light.porch_light # switch.porch_lights_hs200
-    - light.kid_bedroom_walkin_closet # switch.kid_bedroom_walkin_closet
-
-kitchen_lights:
-  name: Kitchen Lights
-  entities:
-    - light.kitchen_first_dimmer_hs220
-    - light.kitchen_second_dimmer_hs220
-    - light.kitchen_light_hs210 # switch.kitchen_light_hs210
-    - light.dinning_table_light # switch.kitchen_second_light
-
-kid_room_lights:
-  name: Kid Room Lights
-  entities:
-    - light.kid_bedroom
-    - light.kid_bedroom_walkin_closet # switch.kid_bedroom_walkin_closet
-
-family_room_lights:
-  name: Living Room Lights
-  entities:
-    - light.family_room
-    - light.rgbic_tv_backlight
-
-master_room_lights:
-  name: Master Room Lights
-  entities:
+    - light.walking_closet
     - light.bathroom_dimmer
-    - light.bathroom_light
-    - light.master_bedroom
-
-patio_lights:
-  name: Patio & Pool Lights
-  entities:
-    - light.patio_light_fan #switch.patio_light_fan
-    - light.patio_main_light #switch.patio_main_light
-    - light.pool_light #switch.pool_light
-
-lights_to_be_turn_off_on_bedtime:
-  name: Lights to be turn off on Bedtime
-  entities:
-    - light.bathroom_dimmer
-    - light.bathroom_light
-    - light.kid_bedroom
-    - light.kitchen_first_dimmer_hs220
-    - light.kitchen_second_dimmer_hs220
-    - light.family_room
-    - light.master_bedroom
-    - light.home_office
-    - light.rgbic_tv_backlight
-    - light.bathroom_light # switch.bathroom_light_hs200
-    - light.dinning_room_light # switch.dining_room_light_hs200
-    - light.entrance_light # switch.enttrance_light_hs200
-    - light.garage_light # switch.garage_light
-    - light.kitchen_light_hs210 # switch.kitchen_light_hs210
+    - light.master_light_switch
+    # Second Bedroom - Maxi
+    - light.kid_bedroom_walkin_closet
+    - light.kid_room_light_switch
+    # Third Bedroom - Emiliano
+    - light.emiliano_room_light_switch
+    # Kitchen
     - light.dinning_table_light # switch.kitchen_second_light
-    - light.laundry_motion_switch_ks200m # switch.laundry_motion_switch_ks200m
-    - light.patio_light # switch.patio_fan_light_hs200
-    - light.porch_light # switch.porch_lights_hs200
-    - light.kid_bedroom_walkin_closet # switch.kid_bedroom_walkin_closet
+    - light.kitchen_first_dimmer
+    - light.kitchen_second_dimmer
+    - switch.kitchen_light
+    # Dinning-Room
+    - light.dinning_room_light # switch.dining_room_light_hs200
+    # Living-Room
+    - light.living_room_light_switch
+    # Patio-Pool
+    - light.patio_main_light
+    - light.patio_light_fan
+    - light.pool_light
+    # Garage
+    - light.garage_light # switch.garage_light
+    # Laundry
+    - light.laundry_motion_light # switch.laundry_motion_light
+    # Office
+    - light.smart_switch_office
+    - light.office_light_switch
+    # Others
+    - light.outside_light
+    - light.porch_light
+    - light.entrance_light # switch.enttrance_light_hs200
 
 ##Fans
 all_fans:
   name: All Fans
   entities:
-    - fan.guest_room
-    - fan.kid_bedroom
-    - fan.family_room
-    - fan.master_bedroom
-    - fan.home_office
-
-bedroom_fans:
-  name: Bedroom Fans
-  entities:
-    - fan.kid_bedroom
-    - fan.master_bedroom
-
-fans_turn_off_bedtime:
-  name: Fans to Turn Off on Bedtime
-  entities:
-    - fan.family_room
-    - fan.home_office
-
-##Office
-office_window_sensors:
-  name: Office Window Sensors
-  entities:
-    - binary_sensor.office_window_right_side
-    - binary_sensor.office_window_right_side
-
-office_window_sensors_battery_state:
-  name: Office Window Sensors
-  entities:
-    - sensor.office_window_left_side_battery
-    - sensor.office_window_right_side_battery
-
-##Windows
-all_sensors:
-  name: All Sensors
-  entities:
-    - binary_sensor.sliding_door_kitchen
-    - binary_sensor.sliding_door_master_room
-    - binary_sensor.office_window_left_side
-    - binary_sensor.office_window_right_side
-
-doors_sensors:
-  name: External Doors Sensors
-  entities:
-    - binary_sensor.sliding_door_kitchen
-    - binary_sensor.sliding_door_master_room
-
-windows_sensors:
-  name: Windows Sensors
-  entities:
-    - binary_sensor.office_window_left_side
-    - binary_sensor.office_window_right_side
-
-##Echo Devices
-all_echo_devices:
-  name: All Echo devices
-  entities:
-    - media_player.kid_echo
-    - media_player.fire_hd_10_kid
-    - media_player.echo_office
-    - media_player.echo_kitchen
-
-##Batteries
-devices_battery:
-  name: Devices Battery Status
-  entities:
-    - sensor.front_door_lock_battery #Yale
-    - sensor.front_door_battery #Ring
-    - sensor.sliding_door_kitchen_battery
-    - sensor.sliding_door_master_room_battery
-    - sensor.office_window_left_side_battery
-    - sensor.office_window_right_side_battery
-    - sensor.ewelink_th01_battery #Foyer
-    - sensor.th_master_room_battery
-    - sensor.humidity_temperature_sensor_garage_battery
+    - fan.emiliano_room_fan_switch
+    - fan.kid_bedroom_fan_switch
+    - fan.living_room_fan_switch
+    - fan.master_fan_switch
+    - fan.office_fan_switch
 
 # Rack Fans
-rack_fans :
+rack_fans:
   name: Rack Smart Plug
   entities:
     - switch.sp_top_fan_rack_switch
     - switch.sp_bottom_fan_rack_switch_switch
+
+door_windows_sensors:
+  name: Sliding Door and Windows Sensors
+  entities:
+    - binary_sensor.sw_office_right_opening
+    - binary_sensor.sw_office_left_opening
+    - binary_sensor.sd_master_bedroom_opening
+    - binary_sensor.sd_kitchen_opening
