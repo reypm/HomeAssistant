@@ -15,6 +15,12 @@ homeassistant:
   internal_url: !secret internal_url
   external_url: !secret external_url
 
+  ## Packages
+  ## https://www.home-assistant.io/docs/configuration/packages/
+  packages:
+    !include_dir_named includes/packages
+    #irrigation: !include includes/packages/irrigation.yaml
+
 default_config:
 wake_on_lan:
 
@@ -78,6 +84,7 @@ input_number: !include_dir_merge_named includes/inputs/number
 
 ## Groups
 group: !include includes/groups/groups.yaml
+
 ## Logger
 #logger:
 #  default: warning
@@ -91,9 +98,6 @@ group: !include includes/groups/groups.yaml
 telegram_bot:
   - platform: polling
     api_key: !secret telegram_api_key
-    #parse_mode: html
-    #trusted_networks:
-    #  - 192.168.11.0/20
     allowed_chat_ids:
       - !secret telegram_reynierpm_chat_id
 
