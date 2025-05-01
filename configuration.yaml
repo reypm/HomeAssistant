@@ -8,125 +8,46 @@ homeassistant:
   latitude: !secret latitude_home
   longitude: !secret longitude_home
   elevation: 0
-  unit_system: imperial
-  temperature_unit: F
-  time_zone: America/New_York
-  currency: USD
   internal_url: !secret internal_url
   external_url: !secret external_url
 
-  ## Packages
-  ## https://www.home-assistant.io/docs/configuration/packages/
-  packages:
-    !include_dir_named includes/packages
-    #irrigation: !include includes/packages/irrigation.yaml
+## Packages
+## https://www.home-assistant.io/docs/configuration/packages/
+#packages: !include_dir_named includes/packages
 
-default_config:
-wake_on_lan:
+#default_config:
+#wake_on_lan:
 
 tts:
   - platform: google_translate
 
-## Frontend
-frontend:
-  themes: !include_dir_merge_named themes/
-#  extra_module_url:
-#    - /hacsfiles/lovelace-card-mod/card-mod.js
+recorder:
+  exclude:
+    domains:
+      - updater
+      - media_player
+      - device_tracker
+      - weather
+      - sun
+    entities:
+      - sun.sun
+      - sensor.cpu
+      - sensor.cpu_temp
+      - sensor.date
+      - sensor.time
+      - sensor.new_york
+      - cover.kitchen_cover
+      - switch.mystrom_switch
+      - sensor.internet_time
+      - sensor.solar_angle1
+      - sensor.solar_angle
+      - automation.lights_watchdog
 
-## Lovelace
-#lovelace:
-#  mode: yaml
-#  dashboards: !include dashboards/dashboards.yaml
-#
-#  resources:
-#    - url: /hacsfiles/stack-in-card/stack-in-card.js
-#      type: module
-#    - url: /hacsfiles/weather-card/weather-card.js
-#      type: module
-#    # https://github.com/ofekashery/vertical-stack-in-card
-#    - url: /hacsfiles/vertical-stack-in-card/vertical-stack-in-card.js?v=0.4.4
-#      type: js
-#    # https://github.com/kalkih/mini-graph-card
-#    - url: /hacsfiles/mini-graph-card/mini-graph-card-bundle.js?v=0.11.0
-#      type: module
-#    - url: /hacsfiles/lovelace-mushroom/mushroom.js
-#      type: module
-#    - url: /hacsfiles/mini-media-player/mini-media-player-bundle.js?v=1.16.5
-#      type: module
-#    - url: /hacsfiles/button-card/button-card.js
-#      type: module
-#    # https://github.com/thomasloven/lovelace-layout-card
-#    - url: /hacsfiles/lovelace-layout-card/layout-card.js
-#      type: module
-#    - url: /hacsfiles/custom-brand-icons/custom-brand-icons.js
-#      type: module
-#    - url: /hacsfiles/lovelace-auto-entities/auto-entities.js
-#      type: module
-#    # https://github.com/custom-cards/stack-in-card
-#    - url: /hacsfiles/stack-in-card/stack-in-card.js
-#      type: module
-#    - url: /hacsfiles/simple-thermostat/simple-thermostat.js
-#      type: module
-#    - url: /hacsfiles/kiosk-mode/kiosk-mode.js
-#      type: module
-#    # Android Tv Card (https://github.com/Nerwyn/android-tv-card)
-#    - url: /hacsfiles/android-tv-card/android-tv-card.js
-#      type: module
-
-sensor: !include_dir_list includes/sensors/
-automation: !include includes/automation/automations.yaml
-script: !include includes/script/scripts.yaml
-scene: !include includes/scene/scenes.yaml
-ios: !include includes/actions/ios.yaml
-template: !include includes/templates/template.yaml
-input_boolean: !include_dir_merge_named includes/inputs/boolean
-input_number: !include_dir_merge_named includes/inputs/number
-
-## Groups
-group: !include includes/groups/groups.yaml
-
-## Logger
-#logger:
-#  default: warning
-#  logs:
-#    custom_components.localtuya: debug
-#    custom_components.localtuya.pytuya: debug
-#pyatv: debug
-#homeassistant.components.apple_tv: debug
-
-## Telegram Webhooks
-telegram_bot:
-  - platform: polling
-    api_key: !secret telegram_api_key
-    allowed_chat_ids:
-      - !secret telegram_reynierpm_chat_id
-
-logger:
-  default: warning
-  #logs:
-  #custom_components.webrtc: debug
-  #custom_components.localtuya: debug
-  #custom_components.localtuya.pytuya: debug
-  #custom_components.tapo: debug
-  #custom_components.tapo_control: debug
-
-utility_meter:
-  hourly_energy:
-    source: sensor.energy_meter
-    cycle: hourly
-  daily_energy:
-    source: sensor.energy_meter
-    cycle: daily
-  monthly_energy:
-    source: sensor.energy_meter
-    cycle: monthly
-
-  hourly_water:
-    source: sensor.water_meter
-    cycle: hourly
-  daily_water:
-    source: sensor.water_meter
-    cycle: daily
-  monthly_water:
-    source: sensor.water_meter
-    cycle: monthly
+  #automation: !include automations.yaml
+#sensor: !include_dir_list includes/sensors/
+#script: !include includes/script/scripts.yaml
+#scene: !include includes/scene/scenes.yaml
+#ios: !include includes/actions/ios.yaml
+#template: !include includes/templates/template.yaml
+#input_boolean: !include_dir_merge_named includes/inputs/boolean
+#input_number: !include_dir_merge_named includes/inputs/number

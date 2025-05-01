@@ -1,4 +1,5 @@
 """Switch platform for nodered."""
+
 import logging
 
 from homeassistant.components.websocket_api import event_message
@@ -30,13 +31,12 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-SERVICE_TRIGGER_SCHEMA = vol.Schema(
-    {
-        vol.Required(CONF_ENTITY_ID): cv.entity_ids,
-        vol.Optional(CONF_OUTPUT_PATH, default="0"): cv.string,
-        vol.Optional(CONF_MESSAGE, default={}): dict,
-    }
-)
+SERVICE_TRIGGER_SCHEMA = {
+    vol.Required(CONF_ENTITY_ID): cv.entity_ids,
+    vol.Optional(CONF_OUTPUT_PATH, default="0"): cv.string,
+    vol.Optional(CONF_MESSAGE, default={}): dict,
+}
+
 EVENT_TRIGGER_NODE = "automation_triggered"
 EVENT_DEVICE_TRIGGER = "device_trigger"
 
