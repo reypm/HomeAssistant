@@ -21,27 +21,34 @@ homeassistant:
 tts:
   - platform: google_translate
 
+energy:
+
 recorder:
+  purge_keep_days: 10
+  auto_purge: true
+  auto_repack: true
   exclude:
     domains:
-      - updater
-      - media_player
       - device_tracker
-      - weather
-      - sun
+      - media_player
+      - uptime
+      - time_date
+      - worldclock
+    entity_globs:
+      - sensor.clock*
+      - sensor.date*
+      - sensor.glances*
+      - sensor.load_*m
+      - sensor.time*
+      - sensor.uptime*
     entities:
-      - sun.sun
-      - sensor.cpu
-      - sensor.cpu_temp
-      - sensor.date
-      - sensor.time
-      - sensor.new_york
-      - cover.kitchen_cover
-      - switch.mystrom_switch
-      - sensor.internet_time
-      - sensor.solar_angle1
-      - sensor.solar_angle
-      - automation.lights_watchdog
+      - camera.front_door
+      - sensor.home_assistant_v2_db
+      - sensor.memory_free
+      - sensor.memory_use
+      - sensor.memory_use_percent
+      - sensor.processor_use
+      - weather.openweathermap
 
   #automation: !include automations.yaml
 #sensor: !include_dir_list includes/sensors/
