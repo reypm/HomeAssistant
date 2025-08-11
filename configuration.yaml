@@ -58,3 +58,27 @@ recorder:
 #template: !include includes/templates/template.yaml
 #input_boolean: !include_dir_merge_named includes/inputs/boolean
 #input_number: !include_dir_merge_named includes/inputs/number
+
+# see: https://github.com/allangood/rtlamr2mqtt#home-assistant-utility-meter-configuration-sample
+# utility_meter:
+#   hourly_water:
+#     source: sensor.water_meter
+#     cycle: hourly
+#   daily_water:
+#     source: sensor.water_meter
+#     cycle: daily
+#   monthly_water:
+#     source: sensor.water_meter
+#     cycle: monthly
+
+#   hourly_energy:
+#     source: sensor.electricity_meter
+#     cycle: hourly
+#   daily_energy:
+#     source: sensor.electricity_meter
+#     cycle: daily
+#     device_class: energy
+#     unit_of_measurement: kWh
+#   monthly_energy:
+#     source: sensor.electricity_meter
+#     cycle: monthly
