@@ -61,7 +61,7 @@ FANON_KEY = "fanon"
 
 
 DREO_API_URL_FORMAT = (
-    "https://app-api-{0}.dreo-cloud.com"  # {0} is the 2 letter region code
+    "https://app-api-{0}.dreo-tech.com"  # {0} is the 2 letter region code
 )
 
 DREO_API_PATH = "path"
@@ -273,5 +273,6 @@ class DreoDeviceType(StrEnum):
     AIR_CONDITIONER = "Air Conditioner"
     CHEF_MAKER = "Chef Maker"
     HUMIDIFIER = "Humidifier"
+    DEHUMIDIFIER = "Dehumidifier"
     EVAPORATIVE_COOLER = "Evaporative Cooler"
     UNKNOWN = "Unknown"

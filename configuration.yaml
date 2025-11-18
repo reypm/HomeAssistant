@@ -7,9 +7,15 @@ homeassistant:
   name: Home
   latitude: !secret latitude_home
   longitude: !secret longitude_home
+  time_zone: "America/New_York"
   elevation: 0
   internal_url: !secret internal_url
   external_url: !secret external_url
+
+energy:
+
+ffmpeg:
+stream:
 
 ## Packages
 ## https://www.home-assistant.io/docs/configuration/packages/
@@ -20,8 +26,6 @@ homeassistant:
 
 tts:
   - platform: google_translate
-
-energy:
 
 recorder:
   purge_keep_days: 10
@@ -41,44 +45,53 @@ recorder:
       - sensor.load_*m
       - sensor.time*
       - sensor.uptime*
-    entities:
-      - camera.front_door
-      - sensor.home_assistant_v2_db
-      - sensor.memory_free
-      - sensor.memory_use
-      - sensor.memory_use_percent
-      - sensor.processor_use
-      - weather.openweathermap
-
-  #automation: !include automations.yaml
-#sensor: !include_dir_list includes/sensors/
-#script: !include includes/script/scripts.yaml
-#scene: !include includes/scene/scenes.yaml
-#ios: !include includes/actions/ios.yaml
-#template: !include includes/templates/template.yaml
-#input_boolean: !include_dir_merge_named includes/inputs/boolean
-#input_number: !include_dir_merge_named includes/inputs/number
+    #entities:
+    #  - camera.front_door
+    #  - sensor.home_assistant_v2_db
+    #  - sensor.memory_free
+    #  - sensor.memory_use
+    #  - sensor.memory_use_percent
+    #  - sensor.processor_use
+    #  - weather.openweathermap
 
 # see: https://github.com/allangood/rtlamr2mqtt#home-assistant-utility-meter-configuration-sample
-# utility_meter:
-#   hourly_water:
-#     source: sensor.water_meter
-#     cycle: hourly
-#   daily_water:
-#     source: sensor.water_meter
-#     cycle: daily
-#   monthly_water:
-#     source: sensor.water_meter
-#     cycle: monthly
+utility_meter:
+  hourly_water:
+    source: sensor.water_meter_reading
+    name: Hourly Water
+    cycle: hourly
+  daily_water:
+    source: sensor.water_meter_reading
+    name: Daily Water
+    cycle: daily
+  monthly_water:
+    source: sensor.water_meter_reading
+    name: Monthly Water
+    cycle: monthly
 
-#   hourly_energy:
-#     source: sensor.electricity_meter
-#     cycle: hourly
-#   daily_energy:
-#     source: sensor.electricity_meter
-#     cycle: daily
-#     device_class: energy
-#     unit_of_measurement: kWh
-#   monthly_energy:
-#     source: sensor.electricity_meter
-#     cycle: monthly
+  hourly_energy:
+    source: sensor.electricity_meter
+    name: Hourly Energy
+    cycle: hourly
+  daily_energy:
+    source: sensor.electricity_meter
+    name: Daily Energy
+    cycle: daily
+  monthly_energy:
+    source: sensor.electricity_meter
+    name: Monthly Energy
+    cycle: monthly
+
+template:
+  - sensor:
+      - name: "Water Meter Total Gallons"
+        unique_id: water_meter_total_gallons
+        unit_of_measurement: "gal"
+        device_class: water
+        state_class: total_increasing
+        state: >
+          {% if states('sensor.water_meter_total_increase') not in ['unknown', 'unavailable', 'none'] %}
+            {{ (states('sensor.water_meter_total_increase') | float * 264.172) | round(2) }}
+          {% else %}
+            0
+          {% endif %}
