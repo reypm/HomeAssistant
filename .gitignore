@@ -49,3 +49,10 @@ media/downloads/
 
 # ignore backup folder
 non_used_files_bck
+
+# SSH keys
+.ssh/
+id_ed25519
+id_ed25519.pub
+*.pem
+*.key
