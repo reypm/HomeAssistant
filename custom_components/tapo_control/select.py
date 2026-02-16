@@ -7,7 +7,12 @@ from homeassistant.helpers.restore_state import RestoreEntity
 
 from .const import DOMAIN, LOGGER
 from .tapo.entities import TapoSelectEntity
-from .utils import check_and_create, getNightModeName, getNightModeValue
+from .utils import (
+    check_and_create,
+    check_functionality,
+    getNightModeName,
+    getNightModeValue,
+)
 
 
 async def async_setup_entry(
@@ -32,34 +37,74 @@ async def async_setup_entry(
             "night_vision_mode_switching" in entry["camData"]
             and entry["camData"]["night_vision_mode_switching"] is not None
         ):
-            tapoNightVisionSelect = TapoNightVisionSelect(
-                entry,
-                hass,
-                config_entry,
-                "Night Vision Switching",
-                ["auto", "on", "off"],
-                "night_vision_mode_switching",
-                entry["controller"].setDayNightMode,
-            )
-            LOGGER.debug("Adding tapoNightVisionSelect (Night Vision Switching)...")
-            selects.append(tapoNightVisionSelect)
+            if entry["chInfo"]:
+                for lens in entry["chInfo"]:
+                    chn_alias = lens.get("chn_alias", "")
+                    chn_id = lens.get("chn_id")
+                    tapoNightVisionSelect = TapoNightVisionSelect(
+                        entry,
+                        hass,
+                        config_entry,
+                        "Night Vision Switching",
+                        ["auto", "on", "off"],
+                        "night_vision_mode_switching",
+                        entry["controller"].setDayNightMode,
+                        chn_alias,
+                        chn_id,
+                    )
+                    LOGGER.debug(
+                        f"Adding tapoNightVisionSelect (Night Vision Switching) for {chn_alias}, id: {chn_id}..."
+                    )
+                    selects.append(tapoNightVisionSelect)
+            else:
+                tapoNightVisionSelect = TapoNightVisionSelect(
+                    entry,
+                    hass,
+                    config_entry,
+                    "Night Vision Switching",
+                    ["auto", "on", "off"],
+                    "night_vision_mode_switching",
+                    entry["controller"].setDayNightMode,
+                )
+                LOGGER.debug("Adding tapoNightVisionSelect (Night Vision Switching)...")
+                selects.append(tapoNightVisionSelect)
 
         if (
             "night_vision_mode" in entry["camData"]
             and entry["camData"]["night_vision_mode"] is not None
             and entry["camData"]["night_vision_capability"] is not None
         ):
-            tapoNightVisionSelect = TapoNightVisionSelect(
-                entry,
-                hass,
-                config_entry,
-                "Night Vision",
-                entry["camData"]["night_vision_capability"],
-                "night_vision_mode",
-                entry["controller"].setNightVisionModeConfig,
-            )
-            LOGGER.debug("Adding tapoNightVisionSelect (Night Vision)...")
-            selects.append(tapoNightVisionSelect)
+            if entry["chInfo"]:
+                for lens in entry["chInfo"]:
+                    chn_alias = lens.get("chn_alias", "")
+                    chn_id = lens.get("chn_id")
+                    tapoNightVisionSelect = TapoNightVisionSelect(
+                        entry,
+                        hass,
+                        config_entry,
+                        "Night Vision",
+                        entry["camData"]["night_vision_capability"],
+                        "night_vision_mode",
+                        entry["controller"].setNightVisionModeConfig,
+                        chn_alias,
+                        chn_id,
+                    )
+                    LOGGER.debug(
+                        f"Adding tapoNightVisionSelect (Night Vision) for {chn_alias}, id: {chn_id}..."
+                    )
+                    selects.append(tapoNightVisionSelect)
+            else:
+                tapoNightVisionSelect = TapoNightVisionSelect(
+                    entry,
+                    hass,
+                    config_entry,
+                    "Night Vision",
+                    entry["camData"]["night_vision_capability"],
+                    "night_vision_mode",
+                    entry["controller"].setNightVisionModeConfig,
+                )
+                LOGGER.debug("Adding tapoNightVisionSelect (Night Vision)...")
+                selects.append(tapoNightVisionSelect)
 
         tapoLightFrequencySelect = await check_and_create(
             entry, hass, TapoLightFrequencySelect, "getLightFrequencyMode", config_entry
@@ -103,26 +148,72 @@ async def async_setup_entry(
                 LOGGER.debug("Adding tapoAlertTypeSelect with start ID 0...")
                 selects.append(TapoAlertTypeSelect(entry, hass, config_entry, 0))
 
-        tapoMotionDetectionSelect = await check_and_create(
-            entry, hass, TapoMotionDetectionSelect, "getMotionDetection", config_entry
+        tapoMotionDetectionSelectAvailable = await check_functionality(
+            entry, hass, TapoMotionDetectionSelect, "getMotionDetection"
         )
-        if tapoMotionDetectionSelect:
-            LOGGER.debug("Adding TapoMotionDetectionSelect...")
-            selects.append(tapoMotionDetectionSelect)
+        if tapoMotionDetectionSelectAvailable:
+            if entry["chInfo"]:
+                for lens in entry["chInfo"]:
+                    chn_alias = lens.get("chn_alias", "")
+                    chn_id = lens.get("chn_id")
+                    LOGGER.debug(
+                        f"Adding TapoMotionDetectionSelect for {chn_alias}, id: {chn_id}..."
+                    )
+                    selects.append(
+                        TapoMotionDetectionSelect(
+                            entry, hass, config_entry, chn_alias, chn_id
+                        )
+                    )
+            else:
+                LOGGER.debug("Adding TapoMotionDetectionSelect...")
+                selects.append(TapoMotionDetectionSelect(entry, hass, config_entry))
 
-        tapoPersonDetectionSelect = await check_and_create(
-            entry, hass, TapoPersonDetectionSelect, "getPersonDetection", config_entry
+        tapoDualCamLinkageSelectAvailable = await check_functionality(
+            entry, hass, TapoDualCamLinkage, "getDualCamLinkage"
         )
-        if tapoPersonDetectionSelect:
-            LOGGER.debug("Adding tapoPersonDetectionSelect...")
-            selects.append(tapoPersonDetectionSelect)
+        if tapoDualCamLinkageSelectAvailable:
+            LOGGER.debug("Adding TapoDualCamLinkage...")
+            selects.append(TapoDualCamLinkage(entry, hass, config_entry))
 
-        tapoVehicleDetectionSelect = await check_and_create(
-            entry, hass, TapoVehicleDetectionSelect, "getVehicleDetection", config_entry
+        tapoPersonDetectionSelectAvailable = await check_functionality(
+            entry, hass, TapoPersonDetectionSelect, "getPersonDetection"
         )
-        if tapoVehicleDetectionSelect:
-            LOGGER.debug("Adding tapoVehicleDetectionSelect...")
-            selects.append(tapoVehicleDetectionSelect)
+        if tapoPersonDetectionSelectAvailable:
+            if entry["chInfo"]:
+                for lens in entry["chInfo"]:
+                    chn_alias = lens.get("chn_alias", "")
+                    chn_id = lens.get("chn_id")
+                    LOGGER.debug(
+                        f"Adding tapoPersonDetectionSelect for {chn_alias}, id: {chn_id}..."
+                    )
+                    selects.append(
+                        TapoPersonDetectionSelect(
+                            entry, hass, config_entry, chn_alias, chn_id
+                        )
+                    )
+            else:
+                LOGGER.debug("Adding tapoPersonDetectionSelect...")
+                selects.append(TapoPersonDetectionSelect(entry, hass, config_entry))
+
+        tapoVehicleDetectionSelectAvailable = await check_functionality(
+            entry, hass, TapoVehicleDetectionSelect, "getVehicleDetection"
+        )
+        if tapoVehicleDetectionSelectAvailable:
+            if entry["chInfo"]:
+                for lens in entry["chInfo"]:
+                    chn_alias = lens.get("chn_alias", "")
+                    chn_id = lens.get("chn_id")
+                    LOGGER.debug(
+                        f"Adding tapoVehicleDetectionSelect for {chn_alias}, id: {chn_id}..."
+                    )
+                    selects.append(
+                        TapoVehicleDetectionSelect(
+                            entry, hass, config_entry, chn_alias, chn_id
+                        )
+                    )
+            else:
+                LOGGER.debug("Adding tapoVehicleDetectionSelect...")
+                selects.append(TapoVehicleDetectionSelect(entry, hass, config_entry))
 
         tapoBabyCryDetectionSelect = await check_and_create(
             entry, hass, TapoBabyCryDetectionSelect, "getBabyCryDetection", config_entry
@@ -131,12 +222,25 @@ async def async_setup_entry(
             LOGGER.debug("Adding tapoBabyCryDetectionSelect...")
             selects.append(tapoBabyCryDetectionSelect)
 
-        tapoPetDetectionSelect = await check_and_create(
-            entry, hass, TapoPetDetectionSelect, "getPetDetection", config_entry
+        tapoPetDetectionSelectAvailable = await check_functionality(
+            entry, hass, TapoPetDetectionSelect, "getPetDetection"
         )
-        if tapoPetDetectionSelect:
-            LOGGER.debug("Adding tapoPetDetectionSelect...")
-            selects.append(tapoPetDetectionSelect)
+        if tapoPetDetectionSelectAvailable:
+            if entry["chInfo"]:
+                for lens in entry["chInfo"]:
+                    chn_alias = lens.get("chn_alias", "")
+                    chn_id = lens.get("chn_id")
+                    LOGGER.debug(
+                        f"Adding tapoPetDetectionSelect for {chn_alias}, id: {chn_id}..."
+                    )
+                    selects.append(
+                        TapoPetDetectionSelect(
+                            entry, hass, config_entry, chn_alias, chn_id
+                        )
+                    )
+            else:
+                LOGGER.debug("Adding tapoPetDetectionSelect...")
+                selects.append(TapoPetDetectionSelect(entry, hass, config_entry))
 
         tapoBarkDetectionSelect = await check_and_create(
             entry, hass, TapoBarkDetectionSelect, "getBarkDetection", config_entry
@@ -163,12 +267,25 @@ async def async_setup_entry(
             LOGGER.debug("Adding tapoGlassBreakDetectionSelect...")
             selects.append(tapoGlassBreakDetectionSelect)
 
-        tapoTamperDetectionSelect = await check_and_create(
-            entry, hass, TapoTamperDetectionSelect, "getTamperDetection", config_entry
+        tapoTamperDetectionSelectAvailable = await check_functionality(
+            entry, hass, TapoTamperDetectionSelect, "getTamperDetection"
         )
-        if tapoTamperDetectionSelect:
-            LOGGER.debug("Adding tapoTamperDetectionSelect...")
-            selects.append(tapoTamperDetectionSelect)
+        if tapoTamperDetectionSelectAvailable:
+            if entry["chInfo"]:
+                for lens in entry["chInfo"]:
+                    chn_alias = lens.get("chn_alias", "")
+                    chn_id = lens.get("chn_id")
+                    LOGGER.debug(
+                        f"Adding tapoTamperDetectionSelect for {chn_alias}, id: {chn_id}..."
+                    )
+                    selects.append(
+                        TapoTamperDetectionSelect(
+                            entry, hass, config_entry, chn_alias, chn_id
+                        )
+                    )
+            else:
+                LOGGER.debug("Adding tapoTamperDetectionSelect...")
+                selects.append(TapoTamperDetectionSelect(entry, hass, config_entry))
 
         tapoMoveToPresetSelect = await check_and_create(
             entry, hass, TapoMoveToPresetSelect, "getPresets", config_entry
@@ -185,31 +302,59 @@ async def async_setup_entry(
             selects.append(tapoPatrolModeSelect)
 
         if entry["camData"]["whitelampConfigForceTime"] is not None:
-            tapoWhitelampForceTimeSelect = await check_and_create(
-                entry,
-                hass,
-                TapoWhitelampForceTimeSelect,
-                "getWhitelampConfig",
-                config_entry,
+            tapoWhitelampForceTimeSelectAvailable = await check_functionality(
+                entry, hass, TapoWhitelampForceTimeSelect, "getWhitelampConfig"
             )
-            if tapoWhitelampForceTimeSelect:
-                LOGGER.debug("Adding TapoWhitelampForceTimeSelect...")
-                selects.append(tapoWhitelampForceTimeSelect)
+            if tapoWhitelampForceTimeSelectAvailable:
+                if entry["chInfo"]:
+                    for lens in entry["chInfo"]:
+                        chn_alias = lens.get("chn_alias", "")
+                        chn_id = lens.get("chn_id")
+                        force_time = entry["camData"].get("whitelampConfigForceTime")
+                        if isinstance(force_time, dict) and (
+                            str(chn_id) not in force_time
+                            or force_time.get(str(chn_id)) is None
+                        ):
+                            continue
+                        LOGGER.debug(
+                            f"Adding TapoWhitelampForceTimeSelect for {chn_alias}, id: {chn_id}..."
+                        )
+                        selects.append(
+                            TapoWhitelampForceTimeSelect(
+                                entry, hass, config_entry, chn_alias, chn_id
+                            )
+                        )
+                else:
+                    LOGGER.debug("Adding TapoWhitelampForceTimeSelect...")
+                    selects.append(
+                        TapoWhitelampForceTimeSelect(entry, hass, config_entry)
+                    )
 
         if (
             entry["camData"]["whitelampConfigIntensity"] is not None
             and entry["camData"]["smartwtl_digital_level"] is None
         ):
-            tapoWhitelampIntensityLevelSelect = await check_and_create(
-                entry,
-                hass,
-                TapoWhitelampIntensityLevelSelect,
-                "getWhitelampConfig",
-                config_entry,
+            tapoWhitelampIntensityLevelSelectAvailable = await check_functionality(
+                entry, hass, TapoWhitelampIntensityLevelSelect, "getWhitelampConfig"
             )
-            if tapoWhitelampIntensityLevelSelect:
-                LOGGER.debug("Adding TapoWhitelampIntensityLevelSelect...")
-                selects.append(tapoWhitelampIntensityLevelSelect)
+            if tapoWhitelampIntensityLevelSelectAvailable:
+                if entry["chInfo"]:
+                    for lens in entry["chInfo"]:
+                        chn_alias = lens.get("chn_alias", "")
+                        chn_id = lens.get("chn_id")
+                        LOGGER.debug(
+                            f"Adding TapoWhitelampIntensityLevelSelect for {chn_alias}, id: {chn_id}..."
+                        )
+                        selects.append(
+                            TapoWhitelampIntensityLevelSelect(
+                                entry, hass, config_entry, chn_alias, chn_id
+                            )
+                        )
+                else:
+                    LOGGER.debug("Adding TapoWhitelampIntensityLevelSelect...")
+                    selects.append(
+                        TapoWhitelampIntensityLevelSelect(entry, hass, config_entry)
+                    )
 
         if (
             "quick_response" in entry["camData"]
@@ -341,12 +486,21 @@ class TapoChimeSound(TapoSelectEntity):
 
 
 class TapoWhitelampForceTimeSelect(TapoSelectEntity):
-    def __init__(self, entry: dict, hass: HomeAssistant, config_entry):
+    def __init__(
+        self,
+        entry: dict,
+        hass: HomeAssistant,
+        config_entry,
+        specific_name=None,
+        chn_id=None,
+    ):
         self._attr_options = ["5 min", "10 min", "15 min", "30 min"]
         self._attr_current_option = None
+        self.chn_id = chn_id
+        self.read_chn_id = str(chn_id) if chn_id else "1"
         TapoSelectEntity.__init__(
             self,
-            "Spotlight on/off for",
+            f"Spotlight on/off for{" - " + specific_name if specific_name else ""}",
             entry,
             hass,
             config_entry,
@@ -360,32 +514,47 @@ class TapoWhitelampForceTimeSelect(TapoSelectEntity):
         if not camData:
             self._attr_state = "unavailable"
         else:
-            if camData["whitelampConfigForceTime"] == "300":
+            force_time = camData["whitelampConfigForceTime"]
+            if isinstance(force_time, dict):
+                force_time = force_time.get(self.read_chn_id)
+            if force_time == "300":
                 self._attr_current_option = self._attr_options[0]
-            elif camData["whitelampConfigForceTime"] == "600":
+            elif force_time == "600":
                 self._attr_current_option = self._attr_options[1]
-            elif camData["whitelampConfigForceTime"] == "900":
+            elif force_time == "900":
                 self._attr_current_option = self._attr_options[2]
-            elif camData["whitelampConfigForceTime"] == "1800":
+            elif force_time == "1800":
                 self._attr_current_option = self._attr_options[3]
             self._attr_state = self._attr_current_option
 
     async def async_select_option(self, option: str) -> None:
         if option == "5 min":
             result = await self._hass.async_add_executor_job(
-                self._controller.setWhitelampConfig, 300
+                self._controller.setWhitelampConfig,
+                300,
+                False,
+                [self.chn_id] if self.chn_id else None,
             )
         elif option == "10 min":
             result = await self._hass.async_add_executor_job(
-                self._controller.setWhitelampConfig, 600
+                self._controller.setWhitelampConfig,
+                600,
+                False,
+                [self.chn_id] if self.chn_id else None,
             )
         elif option == "15 min":
             result = await self._hass.async_add_executor_job(
-                self._controller.setWhitelampConfig, 900
+                self._controller.setWhitelampConfig,
+                900,
+                False,
+                [self.chn_id] if self.chn_id else None,
             )
         elif option == "30 min":
             result = await self._hass.async_add_executor_job(
-                self._controller.setWhitelampConfig, 1800
+                self._controller.setWhitelampConfig,
+                1800,
+                False,
+                [self.chn_id] if self.chn_id else None,
             )
         if "error_code" not in result or result["error_code"] == 0:
             self._attr_state = option
@@ -394,12 +563,21 @@ class TapoWhitelampForceTimeSelect(TapoSelectEntity):
 
 
 class TapoWhitelampIntensityLevelSelect(TapoSelectEntity):
-    def __init__(self, entry: dict, hass: HomeAssistant, config_entry):
+    def __init__(
+        self,
+        entry: dict,
+        hass: HomeAssistant,
+        config_entry,
+        specific_name=None,
+        chn_id=None,
+    ):
         self._attr_options = ["1", "2", "3", "4", "5"]
         self._attr_current_option = None
+        self.chn_id = chn_id
+        self.read_chn_id = str(chn_id) if chn_id else "1"
         TapoSelectEntity.__init__(
             self,
-            "Spotlight Intensity",
+            f"Spotlight Intensity{" - " + specific_name if specific_name else ""}",
             entry,
             hass,
             config_entry,
@@ -413,12 +591,18 @@ class TapoWhitelampIntensityLevelSelect(TapoSelectEntity):
         if not camData:
             self._attr_state = "unavailable"
         else:
-            self._attr_current_option = camData["whitelampConfigIntensity"]
+            intensity = camData["whitelampConfigIntensity"]
+            if isinstance(intensity, dict):
+                intensity = intensity.get(self.read_chn_id)
+            self._attr_current_option = intensity
             self._attr_state = self._attr_current_option
 
     async def async_select_option(self, option: str) -> None:
         result = await self._hass.async_add_executor_job(
-            self._controller.setWhitelampConfig, False, option
+            self._controller.setWhitelampConfig,
+            False,
+            option,
+            [self.chn_id] if self.chn_id else None,
         )
         if "error_code" not in result or result["error_code"] == 0:
             self._attr_state = option
@@ -656,17 +840,21 @@ class TapoNightVisionSelect(TapoSelectEntity):
         nightVisionOptions: list,
         currentValueKey: str,
         method,
+        specific_name=None,
+        chn_id=None,
     ):
         self._attr_options = []
         self.method = method
         self.currentValueKey = currentValueKey
+        self.chn_id = chn_id
+        self.read_chn_id = str(chn_id) if chn_id else "1"
         for nightVisionCapability in nightVisionOptions:
             self._attr_options.append(getNightModeName(nightVisionCapability))
 
         self._attr_current_option = None
         TapoSelectEntity.__init__(
             self,
-            entityName,
+            f"{entityName}{" - " + specific_name if specific_name else ""}",
             entry,
             hass,
             config_entry,
@@ -681,13 +869,23 @@ class TapoNightVisionSelect(TapoSelectEntity):
         if not camData:
             self._attr_state = "unavailable"
         else:
-            self._attr_current_option = getNightModeName(camData[self.currentValueKey])
-            self._attr_state = self._attr_current_option
+            value = camData[self.currentValueKey]
+
+            if isinstance(value, dict):
+                value = value.get(self.read_chn_id)
+            if value is None:
+                self._attr_current_option = None
+                self._attr_state = "unavailable"
+            else:
+                self._attr_current_option = getNightModeName(value)
+                self._attr_state = self._attr_current_option
 
     async def async_select_option(self, option: str) -> None:
         LOGGER.debug("Calling " + self.method.__name__ + " with " + option + "...")
         result = await self._hass.async_add_executor_job(
-            self.method, getNightModeValue(option)
+            self.method,
+            getNightModeValue(option),
+            [self.chn_id] if self.chn_id else None,
         )
         if "error_code" not in result or result["error_code"] == 0:
             self._attr_state = option
@@ -710,7 +908,15 @@ class TapoLightFrequencySelect(TapoSelectEntity):
         if not camData:
             self._attr_state = STATE_UNAVAILABLE
         else:
-            self._attr_current_option = camData["light_frequency_mode"]
+            light_frequency_mode = camData["light_frequency_mode"]
+            if isinstance(light_frequency_mode, dict):
+                if "1" in light_frequency_mode:
+                    light_frequency_mode = light_frequency_mode.get("1")
+                else:
+                    light_frequency_mode = next(
+                        iter(light_frequency_mode.values()), None
+                    )
+            self._attr_current_option = light_frequency_mode
             self._attr_state = self._attr_current_option
 
     async def async_select_option(self, option: str) -> None:
@@ -779,13 +985,73 @@ class TapoAutomaticAlarmModeSelect(TapoSelectEntity):
         await self._coordinator.async_request_refresh()
 
 
-class TapoMotionDetectionSelect(TapoSelectEntity):
+class TapoDualCamLinkage(TapoSelectEntity):
     def __init__(self, entry: dict, hass: HomeAssistant, config_entry):
-        self._attr_options = ["high", "normal", "low", "off"]
+        self._options_map = {"Continuous tracking": 0, "Fixed view tracking": 1}
+        self._attr_options = ["Continuous tracking", "Fixed view tracking", "off"]
         self._attr_current_option = None
         TapoSelectEntity.__init__(
+            self, "Smart Dual Track Method", entry, hass, config_entry
+        )
+
+    async def async_update(self) -> None:
+        await self._coordinator.async_request_refresh()
+
+    def updateTapo(self, camData):
+        LOGGER.debug(f"TapoDualCamLinkage updateTapo 1")
+        LOGGER.debug(f"Enabled: {camData["dualCamLinkageEnabled"]}")
+        LOGGER.debug(f"Type: {camData["dualCamLinkageType"]}")
+        if not camData:
+            LOGGER.debug("TapoDualCamLinkage updateTapo 2")
+            self._attr_state = STATE_UNAVAILABLE
+        else:
+            LOGGER.debug("TapoDualCamLinkage updateTapo 3")
+            if camData["dualCamLinkageEnabled"] == "off":
+                LOGGER.debug("TapoDualCamLinkage updateTapo 4")
+                self._attr_current_option = "off"
+            else:
+                LOGGER.debug("TapoDualCamLinkage updateTapo 5")
+                linkage_type = str(camData.get("dualCamLinkageType"))
+                self._attr_current_option = next(
+                    (
+                        option
+                        for option, value in self._options_map.items()
+                        if str(value) == linkage_type
+                    ),
+                    "off",
+                )
+            LOGGER.debug("TapoDualCamLinkage updateTapo 6")
+            self._attr_state = self._attr_current_option
+        LOGGER.debug("Updating TapoDualCamLinkage to: " + str(self._attr_state))
+
+    async def async_select_option(self, option: str) -> None:
+        result = await self.hass.async_add_executor_job(
+            self._controller.setDualCamLinkage,
+            option != "off",
+            self._options_map[option] if option != "off" else None,
+        )
+        if "error_code" not in result or result["error_code"] == 0:
+            self._attr_state = option
+        self.async_write_ha_state()
+        await self._coordinator.async_request_refresh()
+
+
+class TapoMotionDetectionSelect(TapoSelectEntity):
+    def __init__(
+        self,
+        entry: dict,
+        hass: HomeAssistant,
+        config_entry,
+        specific_name=None,
+        chn_id=None,
+    ):
+        self._attr_options = ["high", "normal", "low", "off"]
+        self._attr_current_option = None
+        self.chn_id = chn_id
+        self.read_chn_id = str(chn_id) if chn_id else "1"
+        TapoSelectEntity.__init__(
             self,
-            "Motion Detection",
+            f"Motion Detection{" - " + specific_name if specific_name else ""}",
             entry,
             hass,
             config_entry,
@@ -797,18 +1063,26 @@ class TapoMotionDetectionSelect(TapoSelectEntity):
         await self._coordinator.async_request_refresh()
 
     def updateTapo(self, camData):
-        LOGGER.debug("TapoMotionDetectionSelect updateTapo 1")
+        LOGGER.debug(f"TapoMotionDetectionSelect updateTapo 1 ({self.chn_id})")
+        LOGGER.debug(
+            f"Enabled: {camData["motion_detection_enabled"][self.read_chn_id]}"
+        )
+        LOGGER.debug(
+            f"Sensitivity: {camData["motion_detection_sensitivity"][self.read_chn_id]}"
+        )
         if not camData:
             LOGGER.debug("TapoMotionDetectionSelect updateTapo 2")
             self._attr_state = STATE_UNAVAILABLE
         else:
             LOGGER.debug("TapoMotionDetectionSelect updateTapo 3")
-            if camData["motion_detection_enabled"] == "off":
+            if camData["motion_detection_enabled"][self.read_chn_id] == "off":
                 LOGGER.debug("TapoMotionDetectionSelect updateTapo 4")
                 self._attr_current_option = "off"
             else:
                 LOGGER.debug("TapoMotionDetectionSelect updateTapo 5")
-                self._attr_current_option = camData["motion_detection_sensitivity"]
+                self._attr_current_option = camData["motion_detection_sensitivity"][
+                    self.read_chn_id
+                ]
             LOGGER.debug("TapoMotionDetectionSelect updateTapo 6")
             self._attr_state = self._attr_current_option
         LOGGER.debug("Updating TapoMotionDetectionSelect to: " + str(self._attr_state))
@@ -818,6 +1092,7 @@ class TapoMotionDetectionSelect(TapoSelectEntity):
             self._controller.setMotionDetection,
             option != "off",
             option if option != "off" else False,
+            [self.chn_id] if self.chn_id else None,
         )
         if "error_code" not in result or result["error_code"] == 0:
             self._attr_state = option
@@ -826,12 +1101,21 @@ class TapoMotionDetectionSelect(TapoSelectEntity):
 
 
 class TapoPersonDetectionSelect(TapoSelectEntity):
-    def __init__(self, entry: dict, hass: HomeAssistant, config_entry):
+    def __init__(
+        self,
+        entry: dict,
+        hass: HomeAssistant,
+        config_entry,
+        specific_name=None,
+        chn_id=None,
+    ):
         self._attr_options = ["high", "normal", "low", "off"]
         self._attr_current_option = None
+        self.chn_id = chn_id
+        self.read_chn_id = str(chn_id) if chn_id else "1"
         TapoSelectEntity.__init__(
             self,
-            "Person Detection",
+            f"Person Detection{" - " + specific_name if specific_name else ""}",
             entry,
             hass,
             config_entry,
@@ -846,12 +1130,18 @@ class TapoPersonDetectionSelect(TapoSelectEntity):
             self._attr_state = STATE_UNAVAILABLE
         else:
             LOGGER.debug("TapoPersonDetectionSelect updateTapo 3")
-            if camData["person_detection_enabled"] == "off":
+            person_enabled = camData["person_detection_enabled"]
+            person_sensitivity = camData["person_detection_sensitivity"]
+            if isinstance(person_enabled, dict):
+                person_enabled = person_enabled.get(self.read_chn_id)
+            if isinstance(person_sensitivity, dict):
+                person_sensitivity = person_sensitivity.get(self.read_chn_id)
+            if person_enabled == "off":
                 LOGGER.debug("TapoPersonDetectionSelect updateTapo 4")
                 self._attr_current_option = "off"
             else:
                 LOGGER.debug("TapoPersonDetectionSelect updateTapo 5")
-                self._attr_current_option = camData["person_detection_sensitivity"]
+                self._attr_current_option = person_sensitivity
             LOGGER.debug("TapoPersonDetectionSelect updateTapo 6")
             self._attr_state = self._attr_current_option
         LOGGER.debug("Updating TapoPersonDetectionSelect to: " + str(self._attr_state))
@@ -861,6 +1151,7 @@ class TapoPersonDetectionSelect(TapoSelectEntity):
             self._controller.setPersonDetection,
             option != "off",
             option if option != "off" else False,
+            [self.chn_id] if self.chn_id else None,
         )
         if "error_code" not in result or result["error_code"] == 0:
             self._attr_state = option
@@ -869,12 +1160,21 @@ class TapoPersonDetectionSelect(TapoSelectEntity):
 
 
 class TapoVehicleDetectionSelect(TapoSelectEntity):
-    def __init__(self, entry: dict, hass: HomeAssistant, config_entry):
+    def __init__(
+        self,
+        entry: dict,
+        hass: HomeAssistant,
+        config_entry,
+        specific_name=None,
+        chn_id=None,
+    ):
         self._attr_options = ["high", "normal", "low", "off"]
         self._attr_current_option = None
+        self.chn_id = chn_id
+        self.read_chn_id = str(chn_id) if chn_id else "1"
         TapoSelectEntity.__init__(
             self,
-            "Vehicle Detection",
+            f"Vehicle Detection{" - " + specific_name if specific_name else ""}",
             entry,
             hass,
             config_entry,
@@ -889,12 +1189,18 @@ class TapoVehicleDetectionSelect(TapoSelectEntity):
             self._attr_state = STATE_UNAVAILABLE
         else:
             LOGGER.debug("TapoVehicleDetectionSelect updateTapo 3")
-            if camData["vehicle_detection_enabled"] == "off":
+            vehicle_enabled = camData["vehicle_detection_enabled"]
+            vehicle_sensitivity = camData["vehicle_detection_sensitivity"]
+            if isinstance(vehicle_enabled, dict):
+                vehicle_enabled = vehicle_enabled.get(self.read_chn_id)
+            if isinstance(vehicle_sensitivity, dict):
+                vehicle_sensitivity = vehicle_sensitivity.get(self.read_chn_id)
+            if vehicle_enabled == "off":
                 LOGGER.debug("TapoVehicleDetectionSelect updateTapo 4")
                 self._attr_current_option = "off"
             else:
                 LOGGER.debug("TapoVehicleDetectionSelect updateTapo 5")
-                self._attr_current_option = camData["vehicle_detection_sensitivity"]
+                self._attr_current_option = vehicle_sensitivity
             LOGGER.debug("TapoVehicleDetectionSelect updateTapo 6")
             self._attr_state = self._attr_current_option
         LOGGER.debug("Updating TapoVehicleDetectionSelect to: " + str(self._attr_state))
@@ -904,6 +1210,7 @@ class TapoVehicleDetectionSelect(TapoSelectEntity):
             self._controller.setVehicleDetection,
             option != "off",
             option if option != "off" else False,
+            [self.chn_id] if self.chn_id else None,
         )
         if "error_code" not in result or result["error_code"] == 0:
             self._attr_state = option
@@ -955,12 +1262,21 @@ class TapoBabyCryDetectionSelect(TapoSelectEntity):
 
 
 class TapoPetDetectionSelect(TapoSelectEntity):
-    def __init__(self, entry: dict, hass: HomeAssistant, config_entry):
+    def __init__(
+        self,
+        entry: dict,
+        hass: HomeAssistant,
+        config_entry,
+        specific_name=None,
+        chn_id=None,
+    ):
         self._attr_options = ["high", "normal", "low", "off"]
         self._attr_current_option = None
+        self.chn_id = chn_id
+        self.read_chn_id = str(chn_id) if chn_id else "1"
         TapoSelectEntity.__init__(
             self,
-            "Pet Detection",
+            f"Pet Detection{" - " + specific_name if specific_name else ""}",
             entry,
             hass,
             config_entry,
@@ -975,12 +1291,18 @@ class TapoPetDetectionSelect(TapoSelectEntity):
             self._attr_state = STATE_UNAVAILABLE
         else:
             LOGGER.debug("TapoPetDetectionSelect updateTapo 3")
-            if camData["pet_detection_enabled"] == "off":
+            pet_enabled = camData["pet_detection_enabled"]
+            pet_sensitivity = camData["pet_detection_sensitivity"]
+            if isinstance(pet_enabled, dict):
+                pet_enabled = pet_enabled.get(self.read_chn_id)
+            if isinstance(pet_sensitivity, dict):
+                pet_sensitivity = pet_sensitivity.get(self.read_chn_id)
+            if pet_enabled == "off":
                 LOGGER.debug("TapoPetDetectionSelect updateTapo 4")
                 self._attr_current_option = "off"
             else:
                 LOGGER.debug("TapoPetDetectionSelect updateTapo 5")
-                self._attr_current_option = camData["pet_detection_sensitivity"]
+                self._attr_current_option = pet_sensitivity
             LOGGER.debug("TapoPetDetectionSelect updateTapo 6")
             self._attr_state = self._attr_current_option
         LOGGER.debug("Updating TapoPetDetectionSelect to: " + str(self._attr_state))
@@ -990,6 +1312,7 @@ class TapoPetDetectionSelect(TapoSelectEntity):
             self._controller.setPetDetection,
             option != "off",
             option if option != "off" else False,
+            [self.chn_id] if self.chn_id else None,
         )
         if "error_code" not in result or result["error_code"] == 0:
             self._attr_state = option
@@ -1129,12 +1452,21 @@ class TapoGlassBreakDetectionSelect(TapoSelectEntity):
 
 
 class TapoTamperDetectionSelect(TapoSelectEntity):
-    def __init__(self, entry: dict, hass: HomeAssistant, config_entry):
+    def __init__(
+        self,
+        entry: dict,
+        hass: HomeAssistant,
+        config_entry,
+        specific_name=None,
+        chn_id=None,
+    ):
         self._attr_options = ["high", "normal", "low", "off"]
         self._attr_current_option = None
+        self.chn_id = chn_id
+        self.read_chn_id = str(chn_id) if chn_id else "1"
         TapoSelectEntity.__init__(
             self,
-            "Tamper Detection",
+            f"Tamper Detection{" - " + specific_name if specific_name else ""}",
             entry,
             hass,
             config_entry,
@@ -1149,12 +1481,18 @@ class TapoTamperDetectionSelect(TapoSelectEntity):
             self._attr_state = STATE_UNAVAILABLE
         else:
             LOGGER.debug("TapoTamperDetectionSelect updateTapo 3")
-            if camData["tamper_detection_enabled"] == "off":
+            tamper_enabled = camData["tamper_detection_enabled"]
+            tamper_sensitivity = camData["tamper_detection_sensitivity"]
+            if isinstance(tamper_enabled, dict):
+                tamper_enabled = tamper_enabled.get(self.read_chn_id)
+            if isinstance(tamper_sensitivity, dict):
+                tamper_sensitivity = tamper_sensitivity.get(self.read_chn_id)
+            if tamper_enabled == "off":
                 LOGGER.debug("TapoTamperDetectionSelect updateTapo 4")
                 self._attr_current_option = "off"
             else:
                 LOGGER.debug("TapoTamperDetectionSelect updateTapo 5")
-                self._attr_current_option = camData["tamper_detection_sensitivity"]
+                self._attr_current_option = tamper_sensitivity
             LOGGER.debug("TapoTamperDetectionSelect updateTapo 6")
             self._attr_state = self._attr_current_option
         LOGGER.debug("Updating TapoTamperDetectionSelect to: " + str(self._attr_state))
@@ -1164,6 +1502,7 @@ class TapoTamperDetectionSelect(TapoSelectEntity):
             self._controller.setTamperDetection,
             option != "off",
             option if option != "off" else False,
+            [self.chn_id] if self.chn_id else None,
         )
         if "error_code" not in result or result["error_code"] == 0:
             self._attr_state = option

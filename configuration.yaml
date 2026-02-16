@@ -3,6 +3,8 @@
 ###############################################################################
 
 ## Core Configuration. Do not remove.
+default_config:
+
 homeassistant:
   name: Home
   latitude: !secret latitude_home
@@ -11,48 +13,56 @@ homeassistant:
   elevation: 0
   internal_url: !secret internal_url
   external_url: !secret external_url
+  allowlist_external_dirs:
+    - /media
+  media_dirs:
+    local: "/media"
+    recordings: "/media/recordings"
 
 energy:
 
 ffmpeg:
 stream:
 
-## Packages 123
-## https://www.home-assistant.io/docs/configuration/packages/
-#packages: !include_dir_named includes/packages
-
-#default_config:
-#wake_on_lan:
-
 tts:
   - platform: google_translate
 
 recorder:
+  db_url: !secret mariadb_url
   purge_keep_days: 10
   auto_purge: true
   auto_repack: true
-  exclude:
+  include:
     domains:
-      - device_tracker
-      - media_player
-      - uptime
-      - time_date
-      - worldclock
-    entity_globs:
-      - sensor.clock*
-      - sensor.date*
-      - sensor.glances*
-      - sensor.load_*m
-      - sensor.time*
-      - sensor.uptime*
-    #entities:
-    #  - camera.front_door
-    #  - sensor.home_assistant_v2_db
-    #  - sensor.memory_free
-    #  - sensor.memory_use
-    #  - sensor.memory_use_percent
-    #  - sensor.processor_use
-    #  - weather.openweathermap
+      - sensor
+      - switch
+      - binary_sensor
+
+  # purge_keep_days: 10
+  # auto_purge: true
+  # auto_repack: true
+  # exclude:
+  #   domains:
+  #     - device_tracker
+  #     - media_player
+  #     - uptime
+  #     - time_date
+  #     - worldclock
+  #   entity_globs:
+  #     - sensor.clock*
+  #     - sensor.date*
+  #     - sensor.glances*
+  #     - sensor.load_*m
+  #     - sensor.time*
+  #     - sensor.uptime*
+  #entities:
+  #  - camera.front_door
+  #  - sensor.home_assistant_v2_db
+  #  - sensor.memory_free
+  #  - sensor.memory_use
+  #  - sensor.memory_use_percent
+  #  - sensor.processor_use
+  #  - weather.openweathermap
 
 # see: https://github.com/allangood/rtlamr2mqtt#home-assistant-utility-meter-configuration-sample
 utility_meter:

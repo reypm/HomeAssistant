@@ -1,0 +1,13 @@
+webrtc:
+  candidates:
+    - stun:stun.l.google.com:19302
+
+# ffmpeg tuning
+ffmpeg:
+  hwaccel: auto
+  # optionally force h264 if you see codec problems:
+  video: h264
+
+streams:
+  ring_front_door:
+    - rtsp://reynierpm:zD4T.BETEHqXpRz2nPa*@03cabcc9-ring-mqtt:8554/90486c368efb_live
