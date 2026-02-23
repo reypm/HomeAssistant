@@ -13,14 +13,13 @@ homeassistant:
   elevation: 0
   internal_url: !secret internal_url
   external_url: !secret external_url
-  allowlist_external_dirs:
-    - /media
-  media_dirs:
-    local: "/media"
-    recordings: "/media/recordings"
+  #allowlist_external_dirs:
+  #  - /media
+  #media_dirs:
+  #  local: "/media"
+  #  recordings: "/media/recordings"
 
 energy:
-
 ffmpeg:
 stream:
 
@@ -32,11 +31,11 @@ recorder:
   purge_keep_days: 10
   auto_purge: true
   auto_repack: true
-  include:
-    domains:
-      - sensor
-      - switch
-      - binary_sensor
+  #include:
+  #  domains:
+  #    - sensor
+  #    - switch
+  #    - binary_sensor
 
   # purge_keep_days: 10
   # auto_purge: true
