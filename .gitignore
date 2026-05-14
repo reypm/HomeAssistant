@@ -47,6 +47,11 @@ lib/
 # HACS downloaded assets
 www/community/
 
+# Custom components, dashboards and pymyq — managed outside version control
+custom_components/
+dashboards/
+pymyq/
+
 # Log files
 home-assistant.log
 home-assistant.log.*

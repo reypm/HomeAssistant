@@ -1,6 +1,0 @@
-mushroom-dashboard:
-  mode: yaml
-  title: Mushroom Dashboard
-  icon: mdi:mushroom
-  show_in_sidebar: true
-  filename: dashboards/mushroom/mushroom.yaml
