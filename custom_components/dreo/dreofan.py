@@ -1,22 +1,20 @@
 """Support for Dreo fans."""
+
 from __future__ import annotations
 
 import logging
 import math
 from typing import Any
 
-from .haimports import * # pylint: disable=W0401,W0614
+from .haimports import *  # pylint: disable=W0401,W0614
 
 from .dreobasedevice import DreoBaseDeviceHA
-from .pydreo.constant import DreoDeviceType # pylint: disable=C0415
-
-from .const import (
-    LOGGER
-)
+from .pydreo.constant import DreoDeviceType  # pylint: disable=C0415
 
 from .pydreo.pydreofanbase import PyDreoFanBase
 
-_LOGGER = logging.getLogger(LOGGER)
+_LOGGER = logging.getLogger(__name__)
+
 
 class DreoFanHA(DreoBaseDeviceHA, FanEntity):
     """Representation of a Dreo fan."""
@@ -36,14 +34,12 @@ class DreoFanHA(DreoBaseDeviceHA, FanEntity):
         if self.device.type is DreoDeviceType.DEHUMIDIFIER:
             if self.device.preset_mode == "Low":
                 return 33
-            elif self.device.preset_mode == "Medium": 
+            elif self.device.preset_mode == "Medium":
                 return 67
             elif self.device.preset_mode == "High":
                 return 100
             return None
-        return ranged_value_to_percentage(
-            self.device.speed_range, self.device.fan_speed
-        )
+        return ranged_value_to_percentage(self.device.speed_range, self.device.fan_speed)
 
     @property
     def is_on(self) -> bool:
@@ -75,18 +71,16 @@ class DreoFanHA(DreoBaseDeviceHA, FanEntity):
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return the state attributes of the fan."""
-        attr = {"temperature": self.device.temperature,
-            'model': self.device.model,
-            'sn': self.device.serial_number}
+        attr = {"temperature": self.device.temperature, "model": self.device.model, "sn": self.device.serial_number}
         return attr
 
     @property
     def supported_features(self) -> int:
         """Return the list of supported features."""
         supported_features = FanEntityFeature.SET_SPEED | FanEntityFeature.TURN_ON | FanEntityFeature.TURN_OFF
-        if (self.device.preset_modes is not None):
+        if self.device.preset_modes is not None:
             supported_features = supported_features | FanEntityFeature.PRESET_MODE
-        if (self.device.oscillating is not None and self.device.type is not DreoDeviceType.DEHUMIDIFIER):
+        if self.device.oscillating is not None and self.device.type is not DreoDeviceType.DEHUMIDIFIER:
             supported_features = supported_features | FanEntityFeature.OSCILLATE
 
         return supported_features
@@ -98,12 +92,17 @@ class DreoFanHA(DreoBaseDeviceHA, FanEntity):
         **kwargs: Any,
     ) -> None:
         """Turn the device on."""
-        _LOGGER.debug("DreoFanHA:turn_on")
-        self.device.is_on = True
+        _LOGGER.debug("turn_on: turn_on")
+        if preset_mode is not None:
+            self.set_preset_mode(preset_mode)
+        elif percentage is not None:
+            self.set_percentage(percentage)
+        else:
+            self.device.is_on = True
 
     def turn_off(self, **kwargs: Any) -> None:
         """Turn the device off."""
-        _LOGGER.debug("DreoFanHA:turn_off")
+        _LOGGER.debug("turn_off: turn_off")
         self.device.is_on = False
 
     def set_percentage(self, percentage: int) -> None:
@@ -123,17 +122,17 @@ class DreoFanHA(DreoBaseDeviceHA, FanEntity):
             else:
                 self.device.set_preset_mode("High")
         else:
+            if self.device.speed_range is None:
+                _LOGGER.error("set_percentage: speed_range not available for %s", self.device.name)
+                return
             self.device.fan_speed = math.ceil(percentage_to_ranged_value(self.device.speed_range, percentage))
-        
+
         self.schedule_update_ha_state()
 
     def set_preset_mode(self, preset_mode: str) -> None:
         """Set the preset mode of device."""
         if preset_mode not in self.preset_modes:
-            raise ValueError(
-                f"{preset_mode} is not one of the valid preset modes: "
-                f"{self.preset_modes}"
-            )
+            raise ValueError(f"{preset_mode} is not one of the valid preset modes: {self.preset_modes}")
 
         if not self.device.is_on:
             self.device.is_on = True

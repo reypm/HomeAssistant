@@ -23,45 +23,11 @@ energy:
 ffmpeg:
 stream:
 
-tts:
-  - platform: google_translate
-
 recorder:
   db_url: !secret mariadb_url
   purge_keep_days: 10
   auto_purge: true
   auto_repack: true
-  #include:
-  #  domains:
-  #    - sensor
-  #    - switch
-  #    - binary_sensor
-
-  # purge_keep_days: 10
-  # auto_purge: true
-  # auto_repack: true
-  # exclude:
-  #   domains:
-  #     - device_tracker
-  #     - media_player
-  #     - uptime
-  #     - time_date
-  #     - worldclock
-  #   entity_globs:
-  #     - sensor.clock*
-  #     - sensor.date*
-  #     - sensor.glances*
-  #     - sensor.load_*m
-  #     - sensor.time*
-  #     - sensor.uptime*
-  #entities:
-  #  - camera.front_door
-  #  - sensor.home_assistant_v2_db
-  #  - sensor.memory_free
-  #  - sensor.memory_use
-  #  - sensor.memory_use_percent
-  #  - sensor.processor_use
-  #  - weather.openweathermap
 
 # see: https://github.com/allangood/rtlamr2mqtt#home-assistant-utility-meter-configuration-sample
 utility_meter:
@@ -91,6 +57,7 @@ utility_meter:
     name: Monthly Energy
     cycle: monthly
 
+# Raypak see here https://drive.google.com/drive/folders/1Mlw1KKNlMsJ5ypbVEvIbX2FmPkkQsSP9
 template:
   - sensor:
       - name: "Water Meter Total Gallons"
@@ -104,3 +71,167 @@ template:
           {% else %}
             0
           {% endif %}
+
+  - sensor:
+      - name: "Pool Inlet Temp 1"
+        unique_id: raypak_pool_inlet_temp_1
+        unit_of_measurement: "°F"
+        device_class: temperature
+        state_class: measurement
+        state: "{{ state_attr('sensor.raypak_raymote_data', 'v3') }}"
+
+      - name: "Pool Inlet Temp 2"
+        unique_id: raypak_pool_inlet_temp_2
+        unit_of_measurement: "°F"
+        device_class: temperature
+        state_class: measurement
+        state: "{{ state_attr('sensor.raypak_raymote_data', 'v4') }}"
+
+      - name: "Pool Average Inlet Temp"
+        unique_id: raypak_pool_average_inlet_temp
+        unit_of_measurement: "°F"
+        device_class: temperature
+        state_class: measurement
+        state: >
+          {% set t1 = state_attr('sensor.raypak_raymote_data', 'v3') | float(0) %}
+          {% set t2 = state_attr('sensor.raypak_raymote_data', 'v4') | float(0) %}
+          {{ ((t1 + t2) / 2) | round(1) }}
+
+      - name: "Pool Outlet Temp"
+        unique_id: raypak_pool_outlet_temp
+        unit_of_measurement: "°F"
+        device_class: temperature
+        state_class: measurement
+        state: "{{ state_attr('sensor.raypak_raymote_data', 'v5') }}"
+
+      - name: "Coil Temp"
+        unique_id: raypak_coil_temp
+        unit_of_measurement: "°F"
+        device_class: temperature
+        state_class: measurement
+        state: "{{ state_attr('sensor.raypak_raymote_data', 'v6') }}"
+
+      - name: "Outside Air Temp"
+        unique_id: raypak_outside_air_temp
+        unit_of_measurement: "°F"
+        device_class: temperature
+        state_class: measurement
+        state: "{{ state_attr('sensor.raypak_raymote_data', 'v9') }}"
+
+      - name: "Power Supply Voltage"
+        unique_id: raypak_power_supply_voltage
+        unit_of_measurement: "V"
+        device_class: voltage
+        state_class: measurement
+        state: "{{ state_attr('sensor.raypak_raymote_data', 'v10') }}"
+
+      - name: "Estimated Heat Up Time"
+        unique_id: raypak_estimated_heat_up_time
+        unit_of_measurement: "h"
+        device_class: duration
+        state_class: measurement
+        state: "{{ state_attr('sensor.raypak_raymote_data', 'v15') }}"
+
+      - name: "Heat Cycles"
+        unique_id: raypak_heat_cycles
+        state_class: total_increasing
+        state: "{{ state_attr('sensor.raypak_raymote_data', 'v25') }}"
+
+      - name: "Lifetime Heat Hours"
+        unique_id: raypak_lifetime_heat_hours
+        unit_of_measurement: "h"
+        device_class: duration
+        state_class: total_increasing
+        state: "{{ state_attr('sensor.raypak_raymote_data', 'v27') }}"
+
+      - name: "Setpoint"
+        unique_id: raypak_setpoint
+        unit_of_measurement: "°F"
+        device_class: temperature
+        state_class: measurement
+        state: "{{ state_attr('sensor.raypak_raymote_data', 'v41') | int }}"
+
+      - name: "Unit Size"
+        unique_id: raypak_unit_size
+        unit_of_measurement: "BTU"
+        state: "{{ state_attr('sensor.raypak_raymote_data', 'v42') }}"
+
+      - name: "Heater Status"
+        unique_id: raypak_heater_status
+        state: "{{ state_attr('sensor.raypak_raymote_data', 'v55') }}"
+
+      - name: "RSSI"
+        unique_id: raypak_rssi
+        unit_of_measurement: "dBm"
+        device_class: signal_strength
+        state_class: measurement
+        state: "{{ state_attr('sensor.raypak_raymote_data', 'v64') }}"
+
+      - name: "Estimated Flow"
+        unique_id: raypak_estimated_flow
+        unit_of_measurement: "GPH"
+        state_class: measurement
+        state: "{{ state_attr('sensor.raypak_raymote_data', 'v112') }}"
+
+      - name: "Heater ON"
+        unique_id: raypak_heater_on
+        state: "{{ state_attr('sensor.raypak_raymote_data', 'v54') }}"
+
+  - switch:
+      - name: "Pool Heater"
+        unique_id: pool_heater_switch
+        state: "{{ state_attr('sensor.raypak_raymote_data', 'v54') | int == 1 }}"
+        turn_on:
+          - action: rest_command.heater_on
+        turn_off:
+          - action: rest_command.heater_off
+
+sensor:
+  - platform: rest
+    name: "Raypak Raymote Data"
+    resource: !secret raypak_api_get_url
+    method: GET
+    scan_interval: 30
+    value_template: "OK"
+    json_attributes:
+      - v3 # Inlet Water Temp 1
+      - v4 # Inlet Water Temp 2
+      - v5 # Outlet Water Temp
+      - v9 # Outside Air Temp
+      - v10 # Power Supply Voltage
+      - v15 # Estimated Heat Up Time
+      - v25 # Heat Cycles
+      - v27 # Lifetime Heat Hours
+      - v41 # Setpoint
+      - v42 # Unit Size
+      - v55 # Heater Status
+      - v64 # RSSI
+      - v112 # Estimated Flow
+      - v54 # Heater On?
+
+rest_command:
+  heater_on:
+    url: !secret raypak_heater_on_url
+    method: GET
+
+  heater_off:
+    url: !secret raypak_heater_off_url
+    method: GET
+
+  set_temperature:
+    url: !secret raypak_set_temp_url
+    method: GET
+
+climate:
+  - platform: generic_thermostat
+    name: Pool Heater Thermostat
+    heater: switch.pool_heater
+    target_sensor: sensor.pool_average_inlet_temp
+    target_temp: 80
+    min_temp: 50
+    max_temp: 104
+    ac_mode: false
+    cold_tolerance: 0.5
+    hot_tolerance: 0.5
+    #initial_hvac_mode:
+    away_temp: 65

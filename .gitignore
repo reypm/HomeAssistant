@@ -1,3 +1,4 @@
+
 ### HomeAssistant ###
 # Files with personal details
 *.crt
@@ -6,7 +7,7 @@
 .cloud
 .google.token
 .HA_VERSION
-.storage
+.storage/
 .uuid
 icloud/
 google_calendars.yaml
@@ -21,9 +22,11 @@ pyozw.sqlite
 tradfri.conf
 webostv.conf
 alexa_media*
-zigbee*
+zigbee.db
+zigbee.db-shm
+zigbee.db-wal
 *.august.conf
-go2rtc-1.5.0
+go2rtc-*
 node-red/
 ip_bans.yaml
 secrets.yaml
@@ -32,12 +35,17 @@ govee_learning.yaml
 
 # Temporary files
 *.db-journal
+*.db-shm
+*.db-wal
 *.pid
-tts
+tts/
 
 # automatically downloaded dependencies
-deps
-lib
+deps/
+lib/
+
+# HACS downloaded assets
+www/community/
 
 # Log files
 home-assistant.log
@@ -58,3 +66,12 @@ id_ed25519.pub
 *.key
 
 .ha_run.lock
+.cache/
+
+# Zigbee2MQTT runtime data
+zigbee2mqtt/database.db
+zigbee2mqtt/database.db.backup
+zigbee2mqtt/state.json
+zigbee2mqtt/coordinator_backup.json
+zigbee2mqtt/nvm_backup.nvm
+zigbee2mqtt/log/

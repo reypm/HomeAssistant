@@ -17,18 +17,19 @@ from .pydreo import (
     OSCANGLE_ANGLE_MAP,
 )
 
-from .pydreo.constant import DreoHeaterMode
+from .pydreo.constant import (
+    DreoHeaterMode,
+    HEATER_OSCMODE_SWING_MAP,
+    HEATER_SWING_OSCMODE_MAP,
+)
 
 from .const import (
-    LOGGER,
     DOMAIN,
 )
 
-from homeassistant.components.climate import (
-    PRESET_ECO
-)
+from homeassistant.components.climate import PRESET_ECO
 
-_LOGGER = logging.getLogger(LOGGER)
+_LOGGER = logging.getLogger(__name__)
 
 # Heat level preset modes
 PRESET_H1 = "H1"
@@ -67,6 +68,7 @@ PRESET_TO_HEAT_LEVEL = {
     PRESET_H3: 3,
 }
 
+
 # Implementation of the heater
 class DreoHeaterHA(DreoBaseDeviceHA, ClimateEntity):
     """Representation of a Dreo heater as a climate entity."""
@@ -89,7 +91,7 @@ class DreoHeaterHA(DreoBaseDeviceHA, ClimateEntity):
             "DreoHeaterHA:__init__(%s) shows pyDreoDevice as: current_temp(%s), target_temp(%s)",
             pyDreoDevice.name,
             pyDreoDevice.temperature,
-            pyDreoDevice.ecolevel
+            pyDreoDevice.ecolevel,
         )
 
         self._attr_name = "Heater"
@@ -98,20 +100,18 @@ class DreoHeaterHA(DreoBaseDeviceHA, ClimateEntity):
         self._attr_current_temperature = self.device.temperature
         self._attr_swing_mode = self.device.device_definition.swing_modes[0] if self.device.device_definition.swing_modes else None
         self._attr_swing_modes = self.device.device_definition.swing_modes
-        
+
         # Map device mode to HVAC mode using new mappings
-        self._attr_hvac_mode = DREO_HEATER_MODE_TO_HVAC_MODE.get(DreoHeaterMode(self.device.mode), HVACMode.OFF) if self.device.poweron else HVACMode.OFF
-        
+        self._attr_hvac_mode = (
+            DREO_HEATER_MODE_TO_HVAC_MODE.get(DreoHeaterMode(self.device.mode), HVACMode.OFF) if self.device.poweron else HVACMode.OFF
+        )
+
         # Build list of unique HVAC modes from device mode_names
-        hvac_modes_set = {DREO_HEATER_MODE_TO_HVAC_MODE.get(mode) 
-                          for mode in self.device.modes
-                          if mode in DREO_HEATER_MODE_TO_HVAC_MODE}
+        hvac_modes_set = {DREO_HEATER_MODE_TO_HVAC_MODE.get(mode) for mode in self.device.modes if mode in DREO_HEATER_MODE_TO_HVAC_MODE}
         self._attr_hvac_modes = list(hvac_modes_set)
-        
+
         # Build preset modes from device modes that have presets, plus PRESET_NONE and heat level presets
-        preset_modes_set = {DREO_HEATER_MODE_TO_PRESET.get(mode)
-                            for mode in self.device.modes
-                            if mode in DREO_HEATER_MODE_TO_PRESET}
+        preset_modes_set = {DREO_HEATER_MODE_TO_PRESET.get(mode) for mode in self.device.modes if mode in DREO_HEATER_MODE_TO_PRESET}
         # Add heat level presets (H1, H2, H3) if the device supports htalevel
         heat_level_presets = [PRESET_H1, PRESET_H2, PRESET_H3] if self.device.htalevel is not None else []
         self._attr_preset_modes = list(preset_modes_set) + heat_level_presets
@@ -124,7 +124,7 @@ class DreoHeaterHA(DreoBaseDeviceHA, ClimateEntity):
             self._attr_target_temperature,
             self._attr_current_temperature,
             self._attr_swing_mode,
-            self._attr_swing_modes
+            self._attr_swing_modes,
         )
 
     @property
@@ -150,11 +150,7 @@ class DreoHeaterHA(DreoBaseDeviceHA, ClimateEntity):
     @property
     def oscangle(self) -> str | None:
         """Retrieve and map the value of the oscillation angle"""
-        return (
-            ANGLE_OSCANGLE_MAP[self.device.oscangle]
-            if self.device.oscangle in ANGLE_OSCANGLE_MAP
-            else None
-        )
+        return ANGLE_OSCANGLE_MAP[self.device.oscangle] if self.device.oscangle in ANGLE_OSCANGLE_MAP else None
 
     @property
     def htalevels_count(self) -> int:
@@ -180,51 +176,48 @@ class DreoHeaterHA(DreoBaseDeviceHA, ClimateEntity):
         if self.device.poweron and self.device.mode == DreoHeaterMode.HOTAIR:
             if self.device.htalevel is not None and self.device.htalevel in HEAT_LEVEL_TO_PRESET:
                 preset = HEAT_LEVEL_TO_PRESET[self.device.htalevel]
-                _LOGGER.debug("DreoHeaterHA:preset_mode(%s): %s (htalevel: %s)", 
-                              self.device.name, preset, self.device.htalevel)
+                _LOGGER.debug("preset_mode: preset_mode(%s): %s (htalevel: %s)", self.device.name, preset, self.device.htalevel)
                 return preset
-        
+
         # Map device mode to preset if it has one, otherwise PRESET_NONE
         device_mode = DreoHeaterMode(self.device.mode) if self.device.poweron else None
         preset = DREO_HEATER_MODE_TO_PRESET.get(device_mode, PRESET_NONE)
-        _LOGGER.debug("DreoHeaterHA:preset_mode(%s): %s (device.mode: %s)", 
-                      self.device.name, preset, self.device.mode)
+        _LOGGER.debug("preset_mode: preset_mode(%s): %s (device.mode: %s)", self.device.name, preset, self.device.mode)
         return preset
-    
+
     def set_preset_mode(self, preset_mode: str) -> None:
         """Set new preset mode."""
-        _LOGGER.debug("DreoHeaterHA:set_preset_mode(%s) --> %s", self.device.name, preset_mode)
-        
+        _LOGGER.debug("set_preset_mode: set_preset_mode(%s) --> %s", self.device.name, preset_mode)
+
         # Check if this is a heat level preset (H1/H2/H3)
         if preset_mode in PRESET_TO_HEAT_LEVEL:
             heat_level = PRESET_TO_HEAT_LEVEL[preset_mode]
-            _LOGGER.debug("DreoHeaterHA:set_preset_mode(%s) setting heat level to %s", 
-                          self.device.name, heat_level)
+            _LOGGER.debug("set_preset_mode: set_preset_mode(%s) setting heat level to %s", self.device.name, heat_level)
             # Set heat level and ensure we're in HEAT mode
             self.device.poweron = True
             self.device.mode = DreoHeaterMode.HOTAIR
             self.device.htalevel = heat_level
             self.schedule_update_ha_state()
             return
-        
+
         # Map preset to Dreo mode
         dreo_mode = HVAC_PRESET_TO_DREO_HEATER_MODE.get(preset_mode)
-        
+
         if dreo_mode is not None:
             self.device.poweron = True
             self.device.mode = dreo_mode
             self.schedule_update_ha_state()
         elif preset_mode != PRESET_NONE:
-            _LOGGER.warning("DreoHeaterHA:set_preset_mode(%s) invalid preset: %s",
-                          self.device.name, preset_mode)
+            _LOGGER.warning("set_preset_mode: set_preset_mode(%s) invalid preset: %s", self.device.name, preset_mode)
 
     @property
     def supported_features(self) -> int:
         """Return the list of supported features."""
         supported_features = 0
-        if self.preset_mode == PRESET_ECO and self.device.ecolevel is not None:
+        # Support target temperature if the device has ecolevel capability
+        if self.device.ecolevel is not None:
             supported_features |= ClimateEntityFeature.TARGET_TEMPERATURE
-        if self.device.oscon is not None:
+        if self.device.oscon is not None or self.device.oscmode is not None:
             supported_features |= ClimateEntityFeature.SWING_MODE
         if self.device.poweron is not None:
             supported_features |= ClimateEntityFeature.TURN_OFF
@@ -236,7 +229,7 @@ class DreoHeaterHA(DreoBaseDeviceHA, ClimateEntity):
 
     def turn_on(self, **kwargs: Any) -> None:
         """Turn the device on."""
-        _LOGGER.debug("DreoHeaterHA:turn_on(%s)", self.device.name)
+        _LOGGER.debug("turn_on: turn_on(%s)", self.device.name)
         self.device.poweron = True
         # Use preset if ECO, otherwise map HVAC mode to Dreo mode
         current_preset = self.preset_mode or PRESET_NONE
@@ -251,30 +244,28 @@ class DreoHeaterHA(DreoBaseDeviceHA, ClimateEntity):
 
     def turn_off(self, **kwargs: Any) -> None:
         """Turn the device off."""
-        _LOGGER.debug("DreoHeaterHA:turn_off(%s)", self.device.name)
+        _LOGGER.debug("turn_off: turn_off(%s)", self.device.name)
         self.device.poweron = False
         self._last_hvac_mode = self._attr_hvac_mode
 
     @oscon.setter
     def oscon(self, oscon: bool) -> None:
         """Oscillate the fan."""
-        _LOGGER.debug("DreoHeaterHA::oscon(%s) --> %s", self.device.name, oscon)
+        _LOGGER.debug("oscon: :oscon(%s) --> %s", self.device.name, oscon)
         self.device.oscon = oscon
 
     @oscangle.setter
     def oscangle(self, oscangle: str) -> None:
         """Set the oscillation angle"""
-        _LOGGER.debug("DreoHeaterHA::oscangle(%s) -> %s", self.device.name, oscangle)
+        _LOGGER.debug("oscangle: :oscangle(%s) -> %s", self.device.name, oscangle)
         self.device.oscangle = OSCANGLE_ANGLE_MAP[oscangle]
 
     def panel_sound(self, panel_sound: bool) -> None:
-        _LOGGER.debug(
-            "DreoHeaterHA::panel_sound(%s) --> %s", self.device.name, panel_sound
-        )
+        _LOGGER.debug("DreoHeaterHA::panel_sound(%s) --> %s", self.device.name, panel_sound)
         self.device.muteon = not panel_sound
 
     def muteon(self, muteon: bool) -> None:
-        _LOGGER.debug("DreoHeaterHA::muteon(%s) --> %s", self.device.name, muteon)
+        _LOGGER.debug("muteon: :muteon(%s) --> %s", self.device.name, muteon)
         self.device.muteon = muteon
 
     ### Implementation of climate methods
@@ -284,21 +275,20 @@ class DreoHeaterHA(DreoBaseDeviceHA, ClimateEntity):
 
     def set_temperature(self, **kwargs: Any) -> None:
         """Set new target temperature."""
-        if self._attr_hvac_mode == HVACMode.HEAT:
-            self.device.ecolevel = self._attr_target_temperature = int(kwargs.get(
-                ATTR_TEMPERATURE
-            ))
-        else:
-            self._attr_target_temperature = 4  # self.device.temperature
+        temp = kwargs.get(ATTR_TEMPERATURE)
+        if temp is not None:
+            self.device.ecolevel = round(temp)
             self.schedule_update_ha_state()
 
     @property
     def target_temperature(self) -> int | None:
-        return (
-            self.device.ecolevel
-            if self.preset_mode == PRESET_ECO
-            else self.device.temperature
-        )
+        """Return the target temperature.
+
+        Returns the ecolevel (target temperature) if the device supports it,
+        otherwise returns None. This ensures the target temperature is visible
+        even when the device is OFF or in a different mode.
+        """
+        return self.device.ecolevel if self.device.ecolevel is not None else None
 
     @property
     def min_temp(self) -> int | None:
@@ -315,11 +305,10 @@ class DreoHeaterHA(DreoBaseDeviceHA, ClimateEntity):
     @property
     def hvac_mode(self) -> HVACMode:
         # ensure hvac_mode is actually in sync with the device's mode
-        self._attr_hvac_mode = DREO_HEATER_MODE_TO_HVAC_MODE.get(DreoHeaterMode(self.device.mode), HVACMode.OFF) if self.device.poweron else HVACMode.OFF
-        _LOGGER.debug("DreoHeaterHA:hvac_mode(%s): %s (device.mode: %s)", 
-                      self.device.name, 
-                      self._attr_hvac_mode,
-                      self.device.mode)
+        self._attr_hvac_mode = (
+            DREO_HEATER_MODE_TO_HVAC_MODE.get(DreoHeaterMode(self.device.mode), HVACMode.OFF) if self.device.poweron else HVACMode.OFF
+        )
+        _LOGGER.debug("hvac_mode: hvac_mode(%s): %s (device.mode: %s)", self.device.name, self._attr_hvac_mode, self.device.mode)
         return self._attr_hvac_mode
 
     @property
@@ -329,20 +318,25 @@ class DreoHeaterHA(DreoBaseDeviceHA, ClimateEntity):
 
     def set_hvac_mode(self, hvac_mode: HVACMode) -> None:
         """Set new target hvac mode."""
-        _LOGGER.debug("DreoHeaterHA:set_hvac_mode(%s) %s --> %s", self.device.name, self._last_hvac_mode, hvac_mode)
-        
+        _LOGGER.debug("set_hvac_mode: set_hvac_mode(%s) %s --> %s", self.device.name, self._last_hvac_mode, hvac_mode)
+
         # Validate that the requested HVAC mode is supported
         if hvac_mode not in self._attr_hvac_modes:
-            _LOGGER.error("DreoHeaterHA:set_hvac_mode(%s) - Requested HVAC mode %s is not supported. Supported modes: %s",
-                          self.device.name, hvac_mode, self._attr_hvac_modes)
+            _LOGGER.error(
+                "set_hvac_mode: set_hvac_mode(%s) - Requested HVAC mode %s is not supported. Supported modes: %s",
+                self.device.name,
+                hvac_mode,
+                self._attr_hvac_modes,
+            )
             return
-        
+
         self._last_hvac_mode = self._attr_hvac_mode
 
         # Unsure if both of these are needed to be honest.
         if hvac_mode == HVACMode.OFF:
             self.device.poweron = False
-            self.device.mode = DreoHeaterMode.OFF
+            # Don't send mode="off" - "off" is not a real device mode and sending it
+            # can introduce state-sync issues when the device powers back on.
             self._attr_hvac_mode = HVACMode.OFF
         else:
             # Map HVAC mode to Dreo mode
@@ -367,7 +361,10 @@ class DreoHeaterHA(DreoBaseDeviceHA, ClimateEntity):
 
     @property
     def swing_mode(self) -> str | None:
-        if self.device.oscon is not None and self.device.oscon is True:
+        if self.device.oscmode is not None:
+            # Newer firmware uses oscmode integer; map to swing mode string.
+            self._attr_swing_mode = HEATER_OSCMODE_SWING_MAP.get(self.device.oscmode, SWING_OFF)
+        elif self.device.oscon is not None and self.device.oscon is True:
             self._attr_swing_mode = SWING_ON
         elif self.device.oscangle is not None:
             self._attr_swing_mode = ANGLE_OSCANGLE_MAP[self.device.oscangle]
@@ -377,10 +374,12 @@ class DreoHeaterHA(DreoBaseDeviceHA, ClimateEntity):
 
     def set_swing_mode(self, swing_mode: str) -> None:
         """Set new target swing operation."""
-        _LOGGER.debug(
-            "DreoHeaterHA:set_swing_mode(%s) -> %s", self.device.name, swing_mode
-        )
-        if self.device.oscon is not None:
+        _LOGGER.debug("DreoHeaterHA:set_swing_mode(%s) -> %s", self.device.name, swing_mode)
+        if self.device.oscmode is not None:
+            # Newer firmware uses oscmode integer.
+            new_oscmode = HEATER_SWING_OSCMODE_MAP.get(swing_mode, 0)
+            self.device.oscmode = new_oscmode
+        elif self.device.oscon is not None:
             self.oscon = False if swing_mode != SWING_ON and swing_mode in self._attr_swing_modes else True
         elif self.device.oscangle is not None:
             self.oscangle = swing_mode

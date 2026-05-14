@@ -1,6 +1,7 @@
 """Supported device models for the PyDreo library."""
 
 from dataclasses import dataclass
+from typing import Callable
 
 from .constant import (
     HORIZONTAL_ANGLE_RANGE,
@@ -18,7 +19,7 @@ from .constant import (
     DreoDeviceType,
     VERTICAL_ANGLE_RANGE,
     DreoACMode,
-    DreoACFanMode
+    DreoACFanMode,
 )
 
 COOKING_MODES = [
@@ -54,7 +55,7 @@ class DreoDeviceDetails:
     preset_modes: list[str]
     """List of possible preset mode names"""
 
-    device_ranges: dict[range]
+    device_ranges: dict[str, tuple]
     """Dictionary of different ranges"""
 
     mode_names: list[str] | dict
@@ -69,6 +70,9 @@ class DreoDeviceDetails:
     cooking_range: dict
     """Dictionary of different cooking ranges"""
 
+    override_fn: Callable | None
+    """Optional function called once after initial state load to apply hardware-specific overrides."""
+
     def __init__(
         self,
         device_type: DreoDeviceType = None,
@@ -79,20 +83,23 @@ class DreoDeviceDetails:
         fan_modes: list[str] = None,
         cooking_modes: list[str] = None,
         cooking_range: dict = None,
+        override_fn: Callable | None = None,
     ):
-        if (device_type is None):
+        if device_type is None:
             raise ValueError("device_type is required")
 
         self.device_type = device_type
         self.preset_modes = preset_modes
         self.device_ranges = device_ranges
         if self.device_ranges is None:
-            self.device_ranges = {} 
+            self.device_ranges = {}
         self.mode_names = mode_names
         self.swing_modes = swing_modes
         self.fan_modes = fan_modes
         self.cooking_modes = cooking_modes
         self.cooking_range = cooking_range
+        self.override_fn = override_fn
+
 
 @dataclass
 class DreoACDeviceDetails(DreoDeviceDetails):
@@ -113,30 +120,20 @@ class DreoACDeviceDetails(DreoDeviceDetails):
         self.modes = modes
         self.fan_modes = fan_modes
 
+
 @dataclass
 class DreoHeaterDeviceDetails(DreoDeviceDetails):
     """Represents a Dreo Heater device model and capabilities"""
 
-    def __init__(
-        self,
-        device_ranges: dict = None,
-        modes: list[DreoHeaterMode] = None,
-        swing_modes: list[str] = None
-    ):
+    def __init__(self, device_ranges: dict = None, modes: list[DreoHeaterMode] = None, swing_modes: list[str] = None):
         # Set default ranges if not provided
         if device_ranges is None:
-            device_ranges = {
-                HEAT_RANGE: (1, 3),
-                ECOLEVEL_RANGE: (41, 95)
-            }
+            device_ranges = {HEAT_RANGE: (1, 3), ECOLEVEL_RANGE: (41, 95)}
         else:
             # Merge provided ranges with defaults
-            default_ranges = {
-                HEAT_RANGE: (1, 3),
-                ECOLEVEL_RANGE: (41, 95)
-            }
+            default_ranges = {HEAT_RANGE: (1, 3), ECOLEVEL_RANGE: (41, 95)}
             device_ranges = {**default_ranges, **device_ranges}
-        
+
         super().__init__(
             device_type=DreoDeviceType.HEATER,
             device_ranges=device_ranges,
@@ -154,84 +151,98 @@ class DreoHeaterDeviceDetails(DreoDeviceDetails):
 
 # Supported prefixes.
 # These prefixes will be listed along with the models in the below collections.
-SUPPORTED_MODEL_PREFIXES = {
-    "DR-HTF",
-    "DR-HAF",
-    "DR-HAP",
-    "DR-HPF",
-    "DR-HCF",
-    "WH",
-    "DR-HAC",
-    "DR-HHM",
-    "DR-HEC"
-}
+SUPPORTED_MODEL_PREFIXES = {"DR-HTF", "DR-HAF", "DR-HAP", "DR-HPF", "DR-HCF", "WH", "DR-HAC", "DR-HHM", "DR-HEC"}
+
+
+def _haf004s_mcu_override(device) -> None:
+    """Restrict vertical angle range to (0, 90) for DR-HAF004S units with the SC95F8613B MCU.
+
+    Older hardware revisions using this chip cannot physically reach negative vertical
+    angles.  Newer revisions report a different chip string and use the full range
+    parsed from the API, so this function intentionally leaves them untouched.
+    """
+    if device.raw_state is None:
+        return
+    mixed = device.raw_state.get("data", {}).get("mixed", {})
+    mcu_obj = mixed.get("mcu_hardware_model", {})
+    mcu_model = mcu_obj.get("state", "") if isinstance(mcu_obj, dict) else ""
+    if mcu_model == "SC95F8613B":
+        device._vertical_angle_range = (0, 90)  # pylint: disable=protected-access
+
 
 SUPPORTED_DEVICES = {
     # Tower Fans
     "DR-HTF": DreoDeviceDetails(device_type=DreoDeviceType.TOWER_FAN),
-
+    "DR-HTF018S": DreoDeviceDetails(
+        device_type=DreoDeviceType.TOWER_FAN,
+        preset_modes=[
+            ("normal", 1),
+            ("natural", 2),
+            ("sleep", 3),
+            ("auto", 4),
+        ],
+        device_ranges={SPEED_RANGE: (1, 9)},
+    ),
+    "DR-HTF024S": DreoDeviceDetails(
+        device_type=DreoDeviceType.TOWER_FAN,
+        preset_modes=[
+            ("normal", 1),
+            ("natural", 2),
+            ("sleep", 3),
+            ("auto", 4),
+        ],
+        device_ranges={SPEED_RANGE: (1, 9)},
+    ),
     # Air Circulators
     "DR-HAF": DreoDeviceDetails(device_type=DreoDeviceType.AIR_CIRCULATOR),
+    "DR-HAF004S": DreoDeviceDetails(
+        device_type=DreoDeviceType.AIR_CIRCULATOR,
+        override_fn=_haf004s_mcu_override,
+    ),
     "DR-HPF": DreoDeviceDetails(device_type=DreoDeviceType.AIR_CIRCULATOR),
+    # HPF-series devices: The API returns controlsConf with only a template reference
+    # (e.g. {"template": "DR-HPF002S"}) and no control/schedule.modes data, so
+    # parse_preset_modes() cannot auto-detect modes. Preset modes must be hardcoded here.
+    # TODO: Investigate whether the official Dreo Open API provides full controlsConf
+    # data that would allow auto-detection of preset modes for these devices.
     "DR-HPF008S": DreoDeviceDetails(
         device_type=DreoDeviceType.AIR_CIRCULATOR,
         # Note: Fan preset_modes use tuple format (name, value) despite type annotation.
         # This is required for fans that map preset names to numeric mode values.
-        preset_modes=[
-            ("normal", 1),
-            ("auto", 2),
-            ("sleep", 3),
-            ("natural", 4),
-            ("turbo", 5)
-        ],
-        device_ranges={
-            SPEED_RANGE: (1, 9), 
-            VERTICAL_ANGLE_RANGE: (-30, 90)
-        }),
-
+        preset_modes=[("normal", 1), ("auto", 2), ("sleep", 3), ("natural", 4), ("turbo", 5)],
+        device_ranges={SPEED_RANGE: (1, 9), VERTICAL_ANGLE_RANGE: (-30, 90)},
+    ),
     "DR-HPF007S": DreoDeviceDetails(
         device_type=DreoDeviceType.AIR_CIRCULATOR,
-        device_ranges={
-            SPEED_RANGE: (1, 10),
-            HORIZONTAL_ANGLE_RANGE: (-75,75),
-            VERTICAL_ANGLE_RANGE: (-30,90)
-        }),
-    
+        preset_modes=[("normal", 1), ("auto", 2), ("sleep", 3), ("natural", 4), ("turbo", 5), ("custom", 6)],
+        device_ranges={SPEED_RANGE: (1, 10), HORIZONTAL_ANGLE_RANGE: (-75, 75), VERTICAL_ANGLE_RANGE: (-30, 90)},
+    ),
     "DR-HPF005S": DreoDeviceDetails(
+        device_type=DreoDeviceType.AIR_CIRCULATOR, device_ranges={SPEED_RANGE: (1, 10), HORIZONTAL_ANGLE_RANGE: (-60, 60)}
+    ),
+    "DR-HPF020S": DreoDeviceDetails(
         device_type=DreoDeviceType.AIR_CIRCULATOR,
-        device_ranges={
-            SPEED_RANGE: (1, 10),
-            HORIZONTAL_ANGLE_RANGE: (-60, 60)
-        }),
-
+        preset_modes=[("normal", 1), ("auto", 2), ("sleep", 3), ("natural", 4), ("turbo", 5), ("custom", 6)],
+        device_ranges={SPEED_RANGE: (1, 9), HORIZONTAL_ANGLE_RANGE: (-60, 60), VERTICAL_ANGLE_RANGE: (-30, 90)},
+    ),
+    "DR-HPF025S": DreoDeviceDetails(
+        device_type=DreoDeviceType.AIR_CIRCULATOR,
+        preset_modes=[("normal", 1), ("auto", 2), ("sleep", 3), ("natural", 4), ("turbo", 5)],
+        device_ranges={SPEED_RANGE: (1, 9), HORIZONTAL_ANGLE_RANGE: (-60, 60), VERTICAL_ANGLE_RANGE: (0, 90)},
+    ),
     # Ceiling Fans
     "DR-HCF": DreoDeviceDetails(device_type=DreoDeviceType.CEILING_FAN),
-    
-    "DR-HCF002S": DreoDeviceDetails(
-        device_type=DreoDeviceType.CEILING_FAN,
-        device_ranges={
-            SPEED_RANGE: (1, 12)
-        }),
-
+    "DR-HCF002S": DreoDeviceDetails(device_type=DreoDeviceType.CEILING_FAN, device_ranges={SPEED_RANGE: (1, 12)}),
     # Air Purifiers
     "DR-HAP": DreoDeviceDetails(device_type=DreoDeviceType.AIR_PURIFIER),
-
     # Heaters
     "DR-HSH017BS": DreoHeaterDeviceDetails(
-        device_ranges={
-            ECOLEVEL_RANGE: (41, 85)
-        },
+        device_ranges={ECOLEVEL_RANGE: (41, 85)},
     ),
     "DR-HSH003S": DreoHeaterDeviceDetails(
-        device_ranges={
-            ECOLEVEL_RANGE: (41, 85)
-        },
         swing_modes=[SWING_OFF, SWING_ON],
-    ),    
+    ),
     "DR-HSH004S": DreoHeaterDeviceDetails(
-        device_ranges={
-            ECOLEVEL_RANGE: (41, 85)
-        },
         swing_modes=[SWING_OFF, SWING_ON],
     ),
     "DR-HSH006S": DreoHeaterDeviceDetails(
@@ -265,7 +276,8 @@ SUPPORTED_DEVICES = {
         ],
     ),
     "DR-HSH010S": DreoHeaterDeviceDetails(),
-
+    "DR-HSH011": DreoHeaterDeviceDetails(),
+    "DR-HSH011S": DreoHeaterDeviceDetails(),
     # Are these even used?  They don't show up as model numbers.  Should they be a DR prefix?
     "WH714S": DreoHeaterDeviceDetails(
         swing_modes=[
@@ -291,7 +303,6 @@ SUPPORTED_DEVICES = {
             HeaterOscillationAngles.ONE_TWENTY,
         ],
     ),
-
     # Air Conditioners
     # Note we had HAC-005S and HAC-006S in the list but they are identical.
     "DR-HAC": DreoACDeviceDetails(
@@ -301,48 +312,47 @@ SUPPORTED_DEVICES = {
             TARGET_TEMP_RANGE_ECO: (75, 86),
             HUMIDITY_RANGE: (30, 80),
         },
-        modes=[DreoACMode.COOL,
-               DreoACMode.DRY,
-               DreoACMode.FAN,
-               DreoACMode.ECO,
-               DreoACMode.SLEEP],
+        modes=[DreoACMode.COOL, DreoACMode.DRY, DreoACMode.FAN, DreoACMode.ECO, DreoACMode.SLEEP],
         swing_modes=[SWING_OFF, SWING_ON],
-        fan_modes=[DreoACFanMode.AUTO, 
-                   DreoACFanMode.LOW, 
-                   DreoACFanMode.MEDIUM, 
-                   DreoACFanMode.HIGH],
+        fan_modes=[DreoACFanMode.AUTO, DreoACFanMode.LOW, DreoACFanMode.MEDIUM, DreoACFanMode.HIGH],
     ),
-
     "DR-KCM001S": DreoDeviceDetails(
         device_type=DreoDeviceType.CHEF_MAKER,
         cooking_modes=COOKING_MODES,
         cooking_range=COOKING_RANGES,
     ),
-
     "DR-HHM": DreoDeviceDetails(device_type=DreoDeviceType.HUMIDIFIER),
-
+    "DR-HHM014S": DreoDeviceDetails(
+        device_type=DreoDeviceType.HUMIDIFIER,
+        preset_modes=[
+            ("normal", 0),
+            ("auto", 1),
+            ("sleep", 2),
+        ],
+    ),
+    "DR-HHM005S": DreoDeviceDetails(
+        device_type=DreoDeviceType.HUMIDIFIER,
+        preset_modes=[
+            ("auto", 1),
+            ("normal", 0),
+            ("sleep", 2),
+        ],
+    ),
+    "DR-HHM006S": DreoDeviceDetails(
+        device_type=DreoDeviceType.HUMIDIFIER,
+        preset_modes=[
+            ("normal", 0),
+            ("auto", 1),
+            ("sleep", 2),
+        ],
+    ),
     # Dehumidifiers
-        "DR-HDH001S": DreoDeviceDetails(
-        device_type=DreoDeviceType.DEHUMIDIFIER,
-        device_ranges={
-            HUMIDITY_RANGE: (30, 85),
-            SPEED_RANGE: (1, 3)
-        }
-    ),
-
-    "DR-HDH002S": DreoDeviceDetails(
-        device_type=DreoDeviceType.DEHUMIDIFIER,
-        device_ranges={
-            HUMIDITY_RANGE: (30, 85),
-            SPEED_RANGE: (1, 3)
-        }
-    ),
-
+    "DR-HDH001S": DreoDeviceDetails(device_type=DreoDeviceType.DEHUMIDIFIER, device_ranges={HUMIDITY_RANGE: (30, 85), SPEED_RANGE: (1, 3)}),
+    "DR-HDH002S": DreoDeviceDetails(device_type=DreoDeviceType.DEHUMIDIFIER, device_ranges={HUMIDITY_RANGE: (30, 85), SPEED_RANGE: (1, 3)}),
+    "DR-HDH005S": DreoDeviceDetails(device_type=DreoDeviceType.DEHUMIDIFIER, device_ranges={HUMIDITY_RANGE: (30, 85), SPEED_RANGE: (1, 3)}),
     # Evaporative Coolers
     "DR-HEC": DreoDeviceDetails(
         device_type=DreoDeviceType.EVAPORATIVE_COOLER,
-        device_ranges={
-            SPEED_RANGE: (1, 4)
-        },
-    )
+        device_ranges={SPEED_RANGE: (1, 4)},
+    ),
 }

@@ -13,11 +13,11 @@ from .dreobasedevice import DreoBaseDeviceHA
 from .pydreo import PyDreoHumidifier
 
 from .const import (
-    LOGGER,
     DOMAIN,
 )
 
-_LOGGER = logging.getLogger(LOGGER)
+_LOGGER = logging.getLogger(__name__)
+
 
 # Implementation of the Humidifier
 class DreoHumidifierHA(DreoBaseDeviceHA, HumidifierEntity):
@@ -26,10 +26,7 @@ class DreoHumidifierHA(DreoBaseDeviceHA, HumidifierEntity):
     def __init__(self, pyDreoDevice: PyDreoHumidifier) -> None:
         super().__init__(pyDreoDevice)
         self.device = pyDreoDevice
-        _LOGGER.info(
-            "DreoHumidifierHA:__init__(%s)",
-            pyDreoDevice.name
-        )
+        _LOGGER.info("DreoHumidifierHA:__init__(%s)", pyDreoDevice.name)
 
         _LOGGER.info(
             "new DreoHumidifierHA instance(%s), mode %s, available_modes [%s]",
@@ -49,14 +46,14 @@ class DreoHumidifierHA(DreoBaseDeviceHA, HumidifierEntity):
         )
 
     @property
-    def supported_features(self) -> int:
+    def supported_features(self) -> HumidifierEntityFeature:
         """Return the list of supported features."""
-        supported_features = 0
+        supported_features = HumidifierEntityFeature(0)
         if self.device.modes is not None:
             supported_features |= HumidifierEntityFeature.MODES
 
         return supported_features
-    
+
     @property
     def is_on(self) -> bool:
         """Return True if device is on."""
@@ -68,51 +65,59 @@ class DreoHumidifierHA(DreoBaseDeviceHA, HumidifierEntity):
         return self.device.mode
 
     @property
-    def available_modes(self) -> int:
+    def available_modes(self) -> list[str]:
         """Return the list of supported modes."""
         return self.device.modes
+
+    @property
+    def min_humidity(self) -> float:
+        """Return the minimum settable humidity."""
+        r = getattr(self.device, "target_humidity_range", None)
+        return float(r[0]) if r else 30.0
+
+    @property
+    def max_humidity(self) -> float:
+        """Return the maximum settable humidity."""
+        r = getattr(self.device, "target_humidity_range", None)
+        return float(r[1]) if r else 90.0
 
     @property
     def current_humidity(self) -> float:
         """Return the current humidity."""
         return self.device.humidity
-    
+
     @property
     def target_humidity(self) -> float:
         """Return the humidity level we try to reach."""
         return self.device.target_humidity
-    
-    def turn_on(self, **kwargs: any) -> None:
-        """Turn the device on."""
-        _LOGGER.debug("DreoHumidiferHA:turn_on(%s)", self.device.name)
-        self.device.is_on = True
 
-    def turn_off(self, **kwargs: any) -> None:
+    def turn_on(self, **kwargs: Any) -> None:
+        """Turn the device on."""
+        _LOGGER.debug("turn_on: turn_on(%s)", self.device.name)
+        self.device.is_on = True
+        self.schedule_update_ha_state()
+
+    def turn_off(self, **kwargs: Any) -> None:
         """Turn the device off."""
-        _LOGGER.debug("DreoHumidiferHA:turn_off(%s)", self.device.name)
+        _LOGGER.debug("turn_off: turn_off(%s)", self.device.name)
         self.device.is_on = False
+        self.schedule_update_ha_state()
 
     def set_mode(self, mode: str) -> None:
         """Set the mode of the device."""
-        _LOGGER.debug(
-            "DreoHumidiferHA:set_mode(%s) --> %s", self.device.name, mode
-        )
-        
+        _LOGGER.debug("DreoHumidifierHA:set_mode(%s) --> %s", self.device.name, mode)
+
         if not self.device.is_on:
             self.device.is_on = True
 
         if mode not in self.available_modes:
-            raise ValueError(
-                f"{mode} is not one of the valid preset modes: {self.available_modes}"
-            )
+            raise ValueError(f"{mode} is not one of the valid preset modes: {self.available_modes}")
 
         self.device.mode = mode
+        self.schedule_update_ha_state()
 
     def set_humidity(self, humidity: float) -> None:
         """Set the humidity level."""
-        _LOGGER.debug(
-            "DreoHumidiferHA:set_humidity(%s) --> %s", self.device.name, humidity
-        )
+        _LOGGER.debug("DreoHumidifierHA:set_humidity(%s) --> %s", self.device.name, humidity)
         self.device.target_humidity = humidity
-
-
+        self.schedule_update_ha_state()
